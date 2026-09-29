@@ -6,6 +6,26 @@
         <a routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">Latest</a>
         <a routerLink="/admin/new" routerLinkActive="active">Write</a>
       </nav>
+      <button
+        type="button"
+        class="theme"
+        [class.is-dark]="theme() === 'dark'"
+        (click)="toggleTheme()"
+        [attr.aria-label]="theme() === 'dark' ? 'Switch to light theme' : 'Switch to dark theme'"
+      >
+        <span class="sky sky-day" aria-hidden="true">
+          <span class="sun"></span>
+          <span class="cloud cloud-a"></span>
+          <span class="cloud cloud-b"></span>
+        </span>
+        <span class="sky sky-night" aria-hidden="true">
+          <span class="moon"></span>
+          <span class="star star-a"></span>
+          <span class="star star-b"></span>
+          <span class="star star-c"></span>
+          <span class="cloud cloud-night"></span>
+        </span>
+      </button>
       <a class="write" routerLink="/admin/new">Write</a>
     </header>
     <main>

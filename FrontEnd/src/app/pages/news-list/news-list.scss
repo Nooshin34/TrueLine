@@ -5,7 +5,7 @@
 
 .eyebrow {
   margin: 0 0 10px;
-  color: #d0122d;
+  color: var(--accent);
   font-size: 0.75rem;
   font-weight: 700;
   letter-spacing: 0.16em;
@@ -20,7 +20,7 @@
 }
 
 .welcome h1 span {
-  color: #d0122d;
+  color: var(--accent);
 }
 
 .feature {
@@ -92,18 +92,18 @@
 .kicker,
 .foot {
   margin: 0;
-  color: #8b9098;
+  color: var(--faint);
   font-size: 0.82rem;
 }
 
 .kicker {
-  color: #d0122d;
+  color: var(--accent);
   font-weight: 700;
 }
 
 .dek {
   margin: 8px 0 0;
-  color: #3d4450;
+  color: var(--dek);
   line-height: 1.5;
 }
 
@@ -194,13 +194,13 @@
   margin-top: 22px;
   padding: 18px;
   border-radius: 14px;
-  background: #1b1e24;
-  color: #fff;
+  background: var(--write-card);
+  color: var(--write-card-text);
   text-decoration: none;
 }
 
 .write-card .eyebrow {
-  color: #ff8b96;
+  color: var(--accent);
 }
 
 .write-card strong {
@@ -210,15 +210,15 @@
 
 .status {
   margin: 12px 28px 28px;
-  color: #5c6570;
+  color: var(--muted);
 }
 
 .status a {
-  color: #d0122d;
+  color: var(--accent);
 }
 
 .error {
-  color: #9b2335;
+  color: var(--error);
 }
 
 @media (max-width: 860px) {

@@ -5,7 +5,7 @@
 }
 
 .back {
-  color: #d0122d;
+  color: var(--accent);
   font-size: 0.9rem;
   font-weight: 700;
   text-decoration: none;
@@ -39,7 +39,7 @@
 .kicker,
 .foot {
   margin: 0;
-  color: #d0122d;
+  color: var(--accent);
   font-size: 0.85rem;
   font-weight: 700;
 }
@@ -52,14 +52,14 @@
 
 .dek {
   margin: 0;
-  color: #3d4450;
+  color: var(--dek);
   font-size: 1.25rem;
   line-height: 1.5;
 }
 
 .foot {
   margin-top: 16px;
-  color: #8b9098;
+  color: var(--faint);
   font-weight: 500;
 }
 
@@ -72,11 +72,11 @@
 
 .status {
   margin-top: 18px;
-  color: #5c6570;
+  color: var(--muted);
 }
 
 .error {
-  color: #9b2335;
+  color: var(--error);
 }
 
 @media (max-width: 860px) {
