@@ -1,0 +1,6 @@
+@TrueLine.Api_HostAddress = http://localhost:5230
+
+GET {{TrueLine.Api_HostAddress}}/api/news
+Accept: application/json
+
+###

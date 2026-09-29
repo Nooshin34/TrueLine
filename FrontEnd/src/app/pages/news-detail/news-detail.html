@@ -1,0 +1,28 @@
+<article class="story">
+  <a class="back" routerLink="/">Latest</a>
+
+  @if (loading()) {
+    <p class="status">Loading story...</p>
+  } @else if (error()) {
+    <p class="status error">{{ error() }}</p>
+  } @else if (article(); as item) {
+    <div
+      class="cover"
+      [class.has-photo]="item.imageUrl"
+      [style.background]="item.imageUrl ? null : coverStyle(item.title)"
+    >
+      @if (item.imageUrl) {
+        <img [src]="item.imageUrl" [alt]="item.title" />
+      } @else {
+        <span>{{ initial(item.title) }}</span>
+      }
+    </div>
+    <p class="kicker">{{ item.author }} · {{ timeAgo(item.publishedAt) }}</p>
+    <h1>{{ item.title }}</h1>
+    @if (item.summary) {
+      <p class="dek">{{ item.summary }}</p>
+    }
+    <p class="foot">News · {{ readMinutes(item.body) }} min read</p>
+    <p class="body">{{ item.body }}</p>
+  }
+</article>

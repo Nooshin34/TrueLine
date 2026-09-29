@@ -1,0 +1,81 @@
+.page {
+  max-width: 680px;
+  margin: 0 auto;
+  padding: 36px 28px 56px;
+}
+
+.page h1 {
+  margin: 0 0 8px;
+  font-size: 2.6rem;
+}
+
+.intro {
+  margin-bottom: 22px;
+  color: #5c6570;
+}
+
+form {
+  display: grid;
+  gap: 14px;
+}
+
+label {
+  display: grid;
+  gap: 6px;
+  font-weight: 650;
+}
+
+input[type='text'],
+input[type='file'],
+textarea {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid #e1e4e8;
+  border-radius: 10px;
+  font: inherit;
+  font-weight: 400;
+}
+
+.check {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 500;
+}
+
+button {
+  justify-self: start;
+  margin-top: 6px;
+  padding: 10px 16px;
+  border: 0;
+  border-radius: 999px;
+  background: #d0122d;
+  color: #fff;
+  font: inherit;
+  cursor: pointer;
+}
+
+button:disabled {
+  opacity: 0.7;
+  cursor: default;
+}
+
+.preview {
+  width: 100%;
+  max-height: 240px;
+  object-fit: cover;
+  border-radius: 12px;
+}
+
+.message.error {
+  margin: 0;
+  color: #9b2335;
+  font-weight: 500;
+}
+
+@media (max-width: 860px) {
+  .page {
+    padding-right: 16px;
+    padding-left: 16px;
+  }
+}

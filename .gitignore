@@ -1,0 +1,25 @@
+# .NET
+**/bin/
+**/obj/
+**/.vs/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+# Angular and Node
+FrontEnd/node_modules/
+FrontEnd/dist/
+FrontEnd/.angular/
+FrontEnd/coverage/
+npm-debug.log
+yarn-error.log
+
+# Local secrets. Copy appsettings.example.json to appsettings.json.
+BackEnd/appsettings.json
+BackEnd/appsettings.Development.json
+
+# Editors and OS
+.idea/
+.DS_Store
+Thumbs.db

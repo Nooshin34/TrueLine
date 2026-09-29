@@ -1,0 +1,91 @@
+.story {
+  max-width: 760px;
+  margin: 0 auto;
+  padding: 28px 28px 56px;
+}
+
+.back {
+  color: #d0122d;
+  font-size: 0.9rem;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.cover {
+  display: flex;
+  align-items: flex-end;
+  height: 320px;
+  margin: 18px 0 22px;
+  padding: 20px;
+  border-radius: 16px;
+  color: #fff;
+  font-family: Georgia, "Palatino Linotype", Palatino, serif;
+  font-size: 6rem;
+  line-height: 0.8;
+}
+
+.cover.has-photo {
+  padding: 0;
+  overflow: hidden;
+}
+
+.cover img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.kicker,
+.foot {
+  margin: 0;
+  color: #d0122d;
+  font-size: 0.85rem;
+  font-weight: 700;
+}
+
+.story h1 {
+  margin: 10px 0 14px;
+  font-size: clamp(2.2rem, 5vw, 3.4rem);
+  line-height: 1.12;
+}
+
+.dek {
+  margin: 0;
+  color: #3d4450;
+  font-size: 1.25rem;
+  line-height: 1.5;
+}
+
+.foot {
+  margin-top: 16px;
+  color: #8b9098;
+  font-weight: 500;
+}
+
+.body {
+  margin-top: 28px;
+  font-size: 1.12rem;
+  line-height: 1.75;
+  white-space: pre-wrap;
+}
+
+.status {
+  margin-top: 18px;
+  color: #5c6570;
+}
+
+.error {
+  color: #9b2335;
+}
+
+@media (max-width: 860px) {
+  .story {
+    padding-right: 16px;
+    padding-left: 16px;
+  }
+
+  .cover {
+    height: 200px;
+  }
+}

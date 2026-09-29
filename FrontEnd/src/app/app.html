@@ -1,0 +1,15 @@
+<div class="canvas">
+  <div class="sheet">
+    <header class="site-header">
+      <a class="brand" routerLink="/">TrueLine</a>
+      <nav>
+        <a routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">Latest</a>
+        <a routerLink="/admin/new" routerLinkActive="active">Write</a>
+      </nav>
+      <a class="write" routerLink="/admin/new">Write</a>
+    </header>
+    <main>
+      <router-outlet />
+    </main>
+  </div>
+</div>
