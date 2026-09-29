@@ -90,12 +90,18 @@ public class NewsController : ControllerBase
             return BadRequest(imageError);
         }
 
+        if (!Enum.IsDefined(request.Category))
+        {
+            return BadRequest("Choose a category.");
+        }
+
         var news = new News
         {
             Title = request.Title.Trim(),
             Summary = string.IsNullOrWhiteSpace(request.Summary) ? null : request.Summary.Trim(),
             Body = request.Body,
             Author = request.Author.Trim(),
+            Category = request.Category,
             PublishedAt = request.PublishedAt == default ? DateTime.UtcNow : request.PublishedAt,
             IsPublished = request.IsPublished,
         };
@@ -138,6 +144,7 @@ public class NewsController : ControllerBase
         existing.Summary = news.Summary;
         existing.Body = news.Body;
         existing.Author = news.Author;
+        existing.Category = news.Category;
         existing.PublishedAt = news.PublishedAt;
         existing.IsPublished = news.IsPublished;
 
@@ -219,6 +226,7 @@ public class NewsController : ControllerBase
         Summary = news.Summary,
         Body = news.Body,
         Author = news.Author,
+        Category = news.Category,
         PublishedAt = news.PublishedAt,
         IsPublished = news.IsPublished,
         ImageUrl = news.Image is null

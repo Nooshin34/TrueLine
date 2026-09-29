@@ -1,5 +1,5 @@
 using System.ComponentModel.DataAnnotations;
-using Microsoft.AspNetCore.Mvc;
+using TrueLine.Backend.Entities;
 
 namespace TrueLine.Api.Contracts;
 
@@ -19,6 +19,9 @@ public class NewsWriteRequest
     [MaxLength(100)]
     public string Author { get; set; } = string.Empty;
 
+    [Required]
+    public NewsCategory Category { get; set; }
+
     public DateTime PublishedAt { get; set; }
 
     public bool IsPublished { get; set; }
@@ -37,6 +40,8 @@ public class NewsResponse
     public string Body { get; set; } = string.Empty;
 
     public string Author { get; set; } = string.Empty;
+
+    public NewsCategory Category { get; set; }
 
     public DateTime PublishedAt { get; set; }
 

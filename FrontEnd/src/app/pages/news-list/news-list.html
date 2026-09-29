@@ -30,7 +30,7 @@
         @if (lead.summary) {
           <p class="dek">{{ lead.summary }}</p>
         }
-        <p class="foot">News · {{ readMinutes(lead.body) }} min read</p>
+        <p class="foot">{{ lead.category }} · {{ readMinutes(lead.body) }} min read</p>
       </div>
     </article>
   }
@@ -63,7 +63,7 @@
               @if (item.summary) {
                 <p class="dek">{{ item.summary }}</p>
               }
-              <p class="foot">News · {{ readMinutes(item.body) }} min read</p>
+              <p class="foot">{{ item.category }} · {{ readMinutes(item.body) }} min read</p>
             </article>
           }
         </div>

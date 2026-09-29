@@ -36,6 +36,19 @@
     }
 
     <label>
+      Category
+      <select formControlName="category">
+        <option value="" disabled>Choose a category</option>
+        @for (category of categories; track category) {
+          <option [value]="category">{{ category }}</option>
+        }
+      </select>
+    </label>
+    @if (form.controls.category.touched && form.controls.category.invalid) {
+      <p class="message error">Choose a category.</p>
+    }
+
+    <label>
       Photo
       <input type="file" accept="image/jpeg,image/png,image/webp,image/gif" (change)="onImageSelected($event)" />
     </label>

@@ -22,6 +22,7 @@ export class NewsService {
     data.append('summary', news.summary ?? '');
     data.append('body', news.body);
     data.append('author', news.author);
+    data.append('category', news.category);
     data.append('publishedAt', news.publishedAt);
     data.append('isPublished', String(news.isPublished));
     if (image) {

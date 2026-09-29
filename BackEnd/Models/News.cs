@@ -12,6 +12,8 @@ public class News
 
     public string Author { get; set; } = string.Empty;
 
+    public NewsCategory Category { get; set; } = NewsCategory.World;
+
     public DateTime PublishedAt { get; set; } = DateTime.UtcNow;
 
     public bool IsPublished { get; set; }

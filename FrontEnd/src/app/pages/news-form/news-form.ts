@@ -3,6 +3,7 @@ import { Component, inject, OnDestroy, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { NewsService } from '../../services/news.service';
+import { newsCategories, NewsCategory } from '../../models/news';
 
 @Component({
   selector: 'app-news-form',
@@ -20,12 +21,14 @@ export class NewsForm implements OnDestroy {
   protected readonly imageFile = signal<File | null>(null);
   protected readonly imageError = signal<string | null>(null);
   protected readonly previewUrl = signal<string | null>(null);
+  protected readonly categories = newsCategories;
 
   protected readonly form = this.formBuilder.nonNullable.group({
     title: ['', [Validators.required, Validators.maxLength(200)]],
     summary: ['', [Validators.maxLength(500)]],
     body: ['', [Validators.required]],
     author: ['', [Validators.required, Validators.maxLength(100)]],
+    category: ['', [Validators.required]],
     isPublished: [true],
   });
 
@@ -46,6 +49,7 @@ export class NewsForm implements OnDestroy {
           summary: value.summary.trim() ? value.summary.trim() : null,
           body: value.body,
           author: value.author,
+          category: value.category as NewsCategory,
           publishedAt: new Date().toISOString(),
           isPublished: value.isPublished,
         },

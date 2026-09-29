@@ -33,6 +33,10 @@ public class AppDbContext : DbContext
                 .IsRequired()
                 .HasMaxLength(100);
 
+            news.Property(item => item.Category)
+                .IsRequired()
+                .HasDefaultValue(NewsCategory.World);
+
             news.HasOne(item => item.Image)
                 .WithOne(image => image.News)
                 .HasForeignKey<NewsImage>(image => image.NewsId)

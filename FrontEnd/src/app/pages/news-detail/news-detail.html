@@ -22,7 +22,7 @@
     @if (item.summary) {
       <p class="dek">{{ item.summary }}</p>
     }
-    <p class="foot">News · {{ readMinutes(item.body) }} min read</p>
+    <p class="foot">{{ item.category }} · {{ readMinutes(item.body) }} min read</p>
     <p class="body">{{ item.body }}</p>
   }
 </article>
