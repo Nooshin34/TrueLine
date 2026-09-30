@@ -59,6 +59,18 @@
         <img src="favicon.svg" alt="" width="36" height="36" />
       </a>
     </header>
+    @if (showTopics()) {
+      <nav class="topics" aria-label="Categories">
+        @for (category of categories; track category) {
+          <a
+            [routerLink]="['/']"
+            [queryParams]="{ category }"
+            routerLinkActive="active"
+            [routerLinkActiveOptions]="{ exact: true, queryParams: 'exact' }"
+          >{{ category }}</a>
+        }
+      </nav>
+    }
     <main>
       <router-outlet />
     </main>

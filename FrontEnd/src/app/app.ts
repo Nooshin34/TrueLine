@@ -1,5 +1,8 @@
-import { Component, inject, OnInit, signal } from '@angular/core';
-import { Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
+import { Component, computed, inject, OnInit, signal } from '@angular/core';
+import { toSignal } from '@angular/core/rxjs-interop';
+import { NavigationEnd, Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
+import { filter, map, startWith } from 'rxjs';
+import { newsCategories } from './models/news';
 import { AuthService } from './services/auth.service';
 import { ThemeService } from './services/theme.service';
 
@@ -16,6 +19,19 @@ export class App implements OnInit {
   protected readonly theme = this.themes.theme;
   protected readonly session = this.auth.session;
   protected readonly menuOpen = signal(false);
+  protected readonly categories = newsCategories;
+  private readonly path = toSignal(
+    this.router.events.pipe(
+      filter((event): event is NavigationEnd => event instanceof NavigationEnd),
+      map((event) => event.urlAfterRedirects.split('?')[0]),
+      startWith(this.router.url.split('?')[0]),
+    ),
+    { initialValue: this.router.url.split('?')[0] },
+  );
+  protected readonly showTopics = computed(() => {
+    const path = this.path();
+    return path === '/' || path.startsWith('/news/');
+  });
 
   ngOnInit(): void {
     this.auth.loadAvatar();

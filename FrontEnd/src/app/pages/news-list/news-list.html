@@ -1,14 +1,25 @@
-<section class="welcome">
-  <p class="eyebrow">Welcome to TrueLine</p>
-  <h1>Stories with a <span>clear line</span>, written to be read.</h1>
-</section>
+@if (category(); as name) {
+  <section class="welcome">
+    <p class="eyebrow">Category</p>
+    <h1>{{ name }}</h1>
+  </section>
+} @else {
+  <section class="welcome">
+    <p class="eyebrow">Welcome to TrueLine</p>
+    <h1>Stories with a <span>clear line</span>, written to be read.</h1>
+  </section>
+}
 
 @if (loading()) {
   <p class="status">Loading stories...</p>
 } @else if (error()) {
   <p class="status error">{{ error() }}</p>
-} @else if (news().length === 0) {
-  <p class="status">No published stories yet. <a routerLink="/admin/new">Write the first one</a>.</p>
+} @else if (stories().length === 0) {
+  @if (category(); as name) {
+    <p class="status">No {{ name }} stories yet.</p>
+  } @else {
+    <p class="status">No published stories yet. <a routerLink="/admin/new">Write the first one</a>.</p>
+  }
 } @else {
   @if (featured(); as lead) {
     <article class="feature">
@@ -35,14 +46,12 @@
     </article>
   }
 
-  <div class="layout">
+  <div class="layout" [class.solo]="stories().length <= 4">
+    @if (latest().length > 0) {
     <section class="latest" id="latest">
       <div class="section-head">
-        <h2>Latest</h2>
+        <h2>{{ category() ?? 'Latest' }}</h2>
       </div>
-      @if (latest().length === 0) {
-        <p class="status">The lead story is the only one published so far.</p>
-      } @else {
         <div class="cards">
           @for (item of latest(); track item.id) {
             <article class="card">
@@ -67,11 +76,11 @@
             </article>
           }
         </div>
-      }
     </section>
+    }
 
-    <aside>
-      @if (news().length > 4) {
+    @if (stories().length > 4) {
+      <aside>
         <div class="section-head">
           <h2>In brief</h2>
         </div>
@@ -96,13 +105,7 @@
             </a>
           }
         </div>
-      }
-
-      <a class="write-card" routerLink="/admin/new">
-        <span class="eyebrow">Newsroom</span>
-        <strong>Have a story to file?</strong>
-        <span>Write it and publish it on the site.</span>
-      </a>
-    </aside>
+      </aside>
+    }
   </div>
 }

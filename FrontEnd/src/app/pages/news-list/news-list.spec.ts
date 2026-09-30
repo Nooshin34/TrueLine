@@ -1,5 +1,6 @@
 import { provideHttpClient } from '@angular/common/http';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { provideRouter } from '@angular/router';
 import { NewsList } from './news-list';
 
 describe('NewsList', () => {
@@ -9,7 +10,7 @@ describe('NewsList', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       imports: [NewsList],
-      providers: [provideHttpClient()],
+      providers: [provideHttpClient(), provideRouter([])],
     }).compileComponents();
 
     fixture = TestBed.createComponent(NewsList);

@@ -23,6 +23,50 @@
   border-bottom: 1px solid var(--line);
 }
 
+.topics {
+  display: flex;
+  gap: 26px;
+  align-items: stretch;
+  padding: 0 28px;
+  border-bottom: 1px solid var(--line);
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.topics::-webkit-scrollbar {
+  display: none;
+}
+
+.topics a {
+  position: relative;
+  flex-shrink: 0;
+  padding: 13px 0 14px;
+  color: var(--text);
+  font-size: 0.98rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.topics a:hover {
+  color: var(--accent);
+}
+
+.topics a.active {
+  color: var(--text);
+}
+
+.topics a.active::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: 22px;
+  height: 3px;
+  background: var(--accent);
+}
+
 .brand {
   color: var(--accent);
   font-family: Georgia, "Palatino Linotype", Palatino, serif;
@@ -314,5 +358,10 @@ nav a.active {
   .site-header {
     gap: 14px;
     padding: 14px 16px;
+  }
+
+  .topics {
+    gap: 20px;
+    padding: 0 16px;
   }
 }

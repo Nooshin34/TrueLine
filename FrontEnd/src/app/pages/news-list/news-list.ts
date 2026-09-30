@@ -1,6 +1,8 @@
 import { Component, computed, inject, OnInit, signal } from '@angular/core';
-import { RouterLink } from '@angular/router';
-import { News } from '../../models/news';
+import { toSignal } from '@angular/core/rxjs-interop';
+import { ActivatedRoute, RouterLink } from '@angular/router';
+import { map } from 'rxjs';
+import { News, NewsCategory, newsCategories } from '../../models/news';
 import { coverStyle, initial, readMinutes, timeAgo } from '../../news-format';
 import { NewsService } from '../../services/news.service';
 
@@ -12,14 +14,28 @@ import { NewsService } from '../../services/news.service';
 })
 export class NewsList implements OnInit {
   private readonly newsService = inject(NewsService);
+  private readonly route = inject(ActivatedRoute);
 
   protected readonly news = signal<News[]>([]);
+  private readonly categoryParam = toSignal(
+    this.route.queryParamMap.pipe(map((params) => params.get('category'))),
+    { initialValue: this.route.snapshot.queryParamMap.get('category') },
+  );
+  protected readonly category = computed(() => {
+    const value = this.categoryParam();
+    return newsCategories.includes(value as NewsCategory) ? (value as NewsCategory) : null;
+  });
   protected readonly loading = signal(true);
   protected readonly error = signal<string | null>(null);
-  protected readonly featured = computed(() => this.news()[0] ?? null);
-  protected readonly picks = computed(() => this.news().slice(1, 4));
-  protected readonly latest = computed(() => {
+  protected readonly stories = computed(() => {
+    const category = this.category();
     const items = this.news();
+    return category ? items.filter((item) => item.category === category) : items;
+  });
+  protected readonly featured = computed(() => this.stories()[0] ?? null);
+  protected readonly picks = computed(() => this.stories().slice(1, 4));
+  protected readonly latest = computed(() => {
+    const items = this.stories();
     return items.length > 4 ? items.slice(4) : items.slice(1);
   });
 

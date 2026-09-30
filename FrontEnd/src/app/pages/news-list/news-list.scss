@@ -148,6 +148,10 @@
   padding: 8px 28px 36px;
 }
 
+.layout.solo {
+  grid-template-columns: 1fr;
+}
+
 .section-head {
   display: flex;
   align-items: baseline;
@@ -231,31 +235,6 @@
   font-family: Georgia, "Palatino Linotype", Palatino, serif;
   font-size: 1rem;
   line-height: 1.3;
-}
-
-.write-card {
-  display: grid;
-  gap: 6px;
-  margin-top: 22px;
-  padding: 18px;
-  border-radius: 16px;
-  background: var(--write-card);
-  color: var(--write-card-text);
-  text-decoration: none;
-  transition: transform 0.18s ease;
-}
-
-.write-card:hover {
-  transform: translateY(-3px);
-}
-
-.write-card .eyebrow {
-  color: var(--accent);
-}
-
-.write-card strong {
-  font-family: Georgia, "Palatino Linotype", Palatino, serif;
-  font-size: 1.35rem;
 }
 
 .status {
