@@ -19,5 +19,7 @@ export interface News {
   category: NewsCategory;
   publishedAt: string;
   isPublished: boolean;
+  userId: number | null;
+  canEdit: boolean;
   imageUrl: string | null;
 }

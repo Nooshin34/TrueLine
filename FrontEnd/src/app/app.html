@@ -5,8 +5,8 @@
       <nav>
         <a routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">Latest</a>
         <a routerLink="/admin/new" routerLinkActive="active">Write</a>
-        @if (session(); as account) {
-          <span class="account">{{ account.name }}</span>
+        @if (session()) {
+          <a routerLink="/dashboard" routerLinkActive="active">Dashboard</a>
           <button type="button" class="nav-button" (click)="logout()">Log out</button>
         } @else {
           <a routerLink="/login" routerLinkActive="active">Log in</a>
@@ -33,7 +33,9 @@
           <span class="cloud cloud-night"></span>
         </span>
       </button>
-      <a class="write" routerLink="/admin/new">Write</a>
+      <a class="mark" routerLink="/" aria-label="TrueLine">
+        <img src="favicon.svg" alt="" width="36" height="36" />
+      </a>
     </header>
     <main>
       <router-outlet />

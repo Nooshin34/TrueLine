@@ -47,5 +47,9 @@ public class NewsResponse
 
     public bool IsPublished { get; set; }
 
+    public int? UserId { get; set; }
+
+    public bool CanEdit { get; set; }
+
     public string? ImageUrl { get; set; }
 }

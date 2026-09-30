@@ -1,0 +1,14 @@
+<section class="dash">
+  <aside>
+    <p class="eyebrow">Dashboard</p>
+    <h1>{{ greeting() }}</h1>
+    <nav>
+      <a routerLink="/dashboard/overview" routerLinkActive="active">Overview</a>
+      <a routerLink="/dashboard/news" routerLinkActive="active">My news</a>
+      <a routerLink="/dashboard/account" routerLinkActive="active">Account</a>
+    </nav>
+  </aside>
+  <div class="panel">
+    <router-outlet />
+  </div>
+</section>

@@ -1,0 +1,44 @@
+h2 {
+  margin: 0 0 8px;
+  font-size: 2rem;
+}
+
+.intro,
+.status {
+  margin: 0 0 22px;
+  color: var(--muted);
+}
+
+.status.error {
+  color: var(--error);
+}
+
+.stats {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+  margin-bottom: 0;
+}
+
+.stat {
+  display: grid;
+  gap: 4px;
+  padding: 16px;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  color: var(--muted);
+  text-decoration: none;
+}
+
+.stat span {
+  color: var(--text);
+  font-size: 2rem;
+  font-weight: 700;
+  line-height: 1;
+}
+
+@media (max-width: 860px) {
+  .stats {
+    grid-template-columns: 1fr;
+  }
+}

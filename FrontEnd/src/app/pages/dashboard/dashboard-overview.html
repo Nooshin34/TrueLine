@@ -1,0 +1,23 @@
+<h2>Overview</h2>
+<p class="intro">A quick look at the stories on your desk.</p>
+
+@if (loading()) {
+  <p class="status">Loading...</p>
+} @else if (error()) {
+  <p class="status error">{{ error() }}</p>
+} @else {
+  <div class="stats">
+    <a class="stat" routerLink="/dashboard/news">
+      <span>{{ total() }}</span>
+      Stories
+    </a>
+    <a class="stat" routerLink="/dashboard/news">
+      <span>{{ published() }}</span>
+      Published
+    </a>
+    <a class="stat" routerLink="/dashboard/news">
+      <span>{{ drafts() }}</span>
+      Drafts
+    </a>
+  </div>
+}

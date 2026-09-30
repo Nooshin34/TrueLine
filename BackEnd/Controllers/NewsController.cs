@@ -1,3 +1,5 @@
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -44,6 +46,26 @@ public class NewsController : ControllerBase
         return Ok(news.Select(ToResponse));
     }
 
+    [Authorize]
+    [HttpGet("mine")]
+    public async Task<ActionResult<IEnumerable<NewsResponse>>> GetMine(CancellationToken cancellationToken)
+    {
+        var userId = CurrentUserId();
+        if (userId is null)
+        {
+            return Unauthorized();
+        }
+
+        var news = await _db.News
+            .AsNoTracking()
+            .Include(item => item.Image)
+            .Where(item => item.UserId == userId)
+            .OrderByDescending(item => item.PublishedAt)
+            .ToListAsync(cancellationToken);
+
+        return Ok(news.Select(ToResponse));
+    }
+
     [HttpGet("{id:int}")]
     public async Task<ActionResult<NewsResponse>> GetById(int id, CancellationToken cancellationToken)
     {
@@ -52,7 +74,7 @@ public class NewsController : ControllerBase
             .Include(item => item.Image)
             .FirstOrDefaultAsync(item => item.Id == id, cancellationToken);
 
-        if (news is null)
+        if (news is null || !CanRead(news))
         {
             return NotFound();
         }
@@ -63,22 +85,23 @@ public class NewsController : ControllerBase
     [HttpGet("{id:int}/image")]
     public async Task<IActionResult> GetImage(int id, CancellationToken cancellationToken)
     {
-        var image = await _db.NewsImages
+        var news = await _db.News
             .AsNoTracking()
-            .FirstOrDefaultAsync(item => item.NewsId == id, cancellationToken);
+            .Include(item => item.Image)
+            .FirstOrDefaultAsync(item => item.Id == id, cancellationToken);
 
-        if (image is null)
+        if (news?.Image is null || !CanRead(news))
         {
             return NotFound();
         }
 
-        var stored = await _images.OpenAsync(image.ObjectKey, cancellationToken);
+        var stored = await _images.OpenAsync(news.Image.ObjectKey, cancellationToken);
         if (stored is null)
         {
             return NotFound();
         }
 
-        return File(stored.Content, image.ContentType);
+        return File(stored.Content, news.Image.ContentType);
     }
 
     [Authorize]
@@ -97,6 +120,12 @@ public class NewsController : ControllerBase
             return BadRequest("Choose a category.");
         }
 
+        var userId = CurrentUserId();
+        if (userId is null)
+        {
+            return Unauthorized();
+        }
+
         var news = new News
         {
             Title = request.Title.Trim(),
@@ -106,6 +135,7 @@ public class NewsController : ControllerBase
             Category = request.Category,
             PublishedAt = request.PublishedAt == default ? DateTime.UtcNow : request.PublishedAt,
             IsPublished = request.IsPublished,
+            UserId = userId,
         };
 
         _db.News.Add(news);
@@ -132,26 +162,56 @@ public class NewsController : ControllerBase
 
     [Authorize]
     [HttpPut("{id:int}")]
-    public async Task<ActionResult<NewsResponse>> Update(int id, News news, CancellationToken cancellationToken)
+    [RequestSizeLimit(8 * 1024 * 1024)]
+    [RequestFormLimits(MultipartBodyLengthLimit = 8 * 1024 * 1024)]
+    public async Task<ActionResult<NewsResponse>> Update(int id, [FromForm] NewsWriteRequest request, CancellationToken cancellationToken)
     {
+        if (!TryValidateImage(request.Image, out var imageError))
+        {
+            return BadRequest(imageError);
+        }
+
+        if (!Enum.IsDefined(request.Category))
+        {
+            return BadRequest("Choose a category.");
+        }
+
         var existing = await _db.News
             .Include(item => item.Image)
             .FirstOrDefaultAsync(item => item.Id == id, cancellationToken);
 
-        if (existing is null)
+        if (existing is null || existing.UserId != CurrentUserId())
         {
             return NotFound();
         }
 
-        existing.Title = news.Title;
-        existing.Summary = news.Summary;
-        existing.Body = news.Body;
-        existing.Author = news.Author;
-        existing.Category = news.Category;
-        existing.PublishedAt = news.PublishedAt;
-        existing.IsPublished = news.IsPublished;
+        existing.Title = request.Title.Trim();
+        existing.Summary = string.IsNullOrWhiteSpace(request.Summary) ? null : request.Summary.Trim();
+        existing.Body = request.Body;
+        existing.Author = request.Author.Trim();
+        existing.Category = request.Category;
+        existing.IsPublished = request.IsPublished;
+        if (request.PublishedAt != default)
+        {
+            existing.PublishedAt = request.PublishedAt;
+        }
 
         await _db.SaveChangesAsync(cancellationToken);
+
+        if (request.Image is { Length: > 0 })
+        {
+            try
+            {
+                await ReplaceImageAsync(existing, request.Image, cancellationToken);
+            }
+            catch (Exception)
+            {
+                return Problem(
+                    detail: "Could not store the image. Check that MinIO is running and the MinIO settings are filled in.",
+                    statusCode: StatusCodes.Status502BadGateway);
+            }
+        }
+
         return Ok(ToResponse(existing));
     }
 
@@ -163,7 +223,7 @@ public class NewsController : ControllerBase
             .Include(item => item.Image)
             .FirstOrDefaultAsync(item => item.Id == id, cancellationToken);
 
-        if (existing is null)
+        if (existing is null || existing.UserId != CurrentUserId())
         {
             return NotFound();
         }
@@ -182,6 +242,27 @@ public class NewsController : ControllerBase
         _db.News.Remove(existing);
         await _db.SaveChangesAsync(cancellationToken);
         return NoContent();
+    }
+
+    private async Task ReplaceImageAsync(News news, IFormFile image, CancellationToken cancellationToken)
+    {
+        if (news.Image is not null)
+        {
+            var previousKey = news.Image.ObjectKey;
+            _db.NewsImages.Remove(news.Image);
+            news.Image = null;
+            await _db.SaveChangesAsync(cancellationToken);
+
+            try
+            {
+                await _images.DeleteAsync(previousKey, cancellationToken);
+            }
+            catch (Exception)
+            {
+            }
+        }
+
+        await SaveImageAsync(news, image, cancellationToken);
     }
 
     private async Task SaveImageAsync(News news, IFormFile image, CancellationToken cancellationToken)
@@ -223,6 +304,17 @@ public class NewsController : ControllerBase
         return true;
     }
 
+    private bool CanRead(News news) =>
+        news.IsPublished || news.UserId == CurrentUserId();
+
+    private int? CurrentUserId()
+    {
+        var value = User.FindFirstValue(JwtRegisteredClaimNames.Sub)
+            ?? User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+        return int.TryParse(value, out var id) ? id : null;
+    }
+
     private NewsResponse ToResponse(News news) => new()
     {
         Id = news.Id,
@@ -233,6 +325,8 @@ public class NewsController : ControllerBase
         Category = news.Category,
         PublishedAt = news.PublishedAt,
         IsPublished = news.IsPublished,
+        UserId = news.UserId,
+        CanEdit = news.UserId is not null && news.UserId == CurrentUserId(),
         ImageUrl = news.Image is null
             ? null
             : $"{Request.Scheme}://{Request.Host}/api/news/{news.Id}/image",

@@ -64,7 +64,7 @@ export class AuthPage {
 
   private afterAuth(): void {
     const returnUrl = this.route.snapshot.queryParamMap.get('returnUrl');
-    const target = returnUrl?.startsWith('/') ? returnUrl : '/';
+    const target = returnUrl?.startsWith('/') ? returnUrl : '/dashboard';
     this.router.navigateByUrl(target);
   }
 

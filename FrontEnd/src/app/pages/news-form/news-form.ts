@@ -1,7 +1,7 @@
 import { HttpErrorResponse } from '@angular/common/http';
-import { Component, inject, OnDestroy, signal } from '@angular/core';
+import { Component, inject, OnDestroy, OnInit, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { NewsService } from '../../services/news.service';
 import { newsCategories, NewsCategory } from '../../models/news';
 
@@ -11,11 +11,17 @@ import { newsCategories, NewsCategory } from '../../models/news';
   templateUrl: './news-form.html',
   styleUrl: './news-form.scss',
 })
-export class NewsForm implements OnDestroy {
+export class NewsForm implements OnInit, OnDestroy {
   private readonly newsService = inject(NewsService);
   private readonly router = inject(Router);
+  private readonly route = inject(ActivatedRoute);
   private readonly formBuilder = inject(FormBuilder);
+  private articleId: number | null = null;
+  private publishedAt = new Date().toISOString();
 
+  protected readonly editing = signal(false);
+  protected readonly loading = signal(false);
+  protected readonly unavailable = signal(false);
   protected readonly saving = signal(false);
   protected readonly error = signal<string | null>(null);
   protected readonly imageFile = signal<File | null>(null);
@@ -32,6 +38,54 @@ export class NewsForm implements OnDestroy {
     isPublished: [true],
   });
 
+  ngOnInit(): void {
+    const raw = this.route.snapshot.paramMap.get('id');
+    if (!raw) {
+      return;
+    }
+
+    const id = Number(raw);
+    if (!Number.isInteger(id) || id <= 0) {
+      this.editing.set(true);
+      this.unavailable.set(true);
+      this.error.set('Article not found.');
+      return;
+    }
+
+    this.editing.set(true);
+    this.loading.set(true);
+    this.newsService.getById(id).subscribe({
+      next: (article) => {
+        if (!article.canEdit) {
+          this.unavailable.set(true);
+          this.error.set('You can only edit your own stories.');
+          this.loading.set(false);
+          return;
+        }
+
+        this.articleId = article.id;
+        this.publishedAt = article.publishedAt;
+        this.form.patchValue({
+          title: article.title,
+          summary: article.summary ?? '',
+          body: article.body,
+          author: article.author,
+          category: article.category,
+          isPublished: article.isPublished,
+        });
+        if (article.imageUrl) {
+          this.previewUrl.set(article.imageUrl);
+        }
+        this.loading.set(false);
+      },
+      error: () => {
+        this.unavailable.set(true);
+        this.error.set('Article not found.');
+        this.loading.set(false);
+      },
+    });
+  }
+
   protected submit(): void {
     if (this.form.invalid || this.imageError()) {
       this.form.markAllAsTouched();
@@ -39,32 +93,32 @@ export class NewsForm implements OnDestroy {
     }
 
     const value = this.form.getRawValue();
+    const draft = {
+      title: value.title,
+      summary: value.summary.trim() ? value.summary.trim() : null,
+      body: value.body,
+      author: value.author,
+      category: value.category as NewsCategory,
+      publishedAt: this.editing() ? this.publishedAt : new Date().toISOString(),
+      isPublished: value.isPublished,
+    };
+    const save = this.articleId
+      ? this.newsService.update(this.articleId, draft, this.imageFile())
+      : this.newsService.create(draft, this.imageFile());
+
     this.saving.set(true);
     this.error.set(null);
-
-    this.newsService
-      .create(
-        {
-          title: value.title,
-          summary: value.summary.trim() ? value.summary.trim() : null,
-          body: value.body,
-          author: value.author,
-          category: value.category as NewsCategory,
-          publishedAt: new Date().toISOString(),
-          isPublished: value.isPublished,
-        },
-        this.imageFile(),
-      )
-      .subscribe({
-        next: (created) => {
-          this.router.navigate(['/news', created.id]);
-        },
-        error: (err: HttpErrorResponse) => {
-          const detail = err.error?.detail;
-          this.error.set(typeof detail === 'string' ? detail : 'Could not save the news item.');
-          this.saving.set(false);
-        },
-      });
+    save.subscribe({
+      next: (saved) => {
+        this.router.navigate(['/news', saved.id]);
+      },
+      error: (err: HttpErrorResponse) => {
+        const body = err.error;
+        const detail = typeof body === 'string' ? body : body?.detail;
+        this.error.set(typeof detail === 'string' ? detail : 'Could not save the news item.');
+        this.saving.set(false);
+      },
+    });
   }
 
   protected onImageSelected(event: Event): void {
@@ -104,9 +158,9 @@ export class NewsForm implements OnDestroy {
 
   private clearPreview(): void {
     const url = this.previewUrl();
-    if (url) {
+    if (url?.startsWith('blob:')) {
       URL.revokeObjectURL(url);
-      this.previewUrl.set(null);
     }
+    this.previewUrl.set(null);
   }
 }

@@ -39,6 +39,13 @@ public class AppDbContext : DbContext
                 .IsRequired()
                 .HasDefaultValue(NewsCategory.World);
 
+            news.HasOne(item => item.User)
+                .WithMany()
+                .HasForeignKey(item => item.UserId)
+                .OnDelete(DeleteBehavior.SetNull);
+
+            news.HasIndex(item => item.UserId);
+
             news.HasOne(item => item.Image)
                 .WithOne(image => image.News)
                 .HasForeignKey<NewsImage>(image => image.NewsId)

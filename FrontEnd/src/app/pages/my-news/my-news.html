@@ -1,0 +1,52 @@
+<section class="page">
+  <div class="head">
+    <div>
+      <p class="eyebrow">Your desk</p>
+      <h2>My news list</h2>
+    </div>
+    <a class="write" routerLink="/admin/new">Write</a>
+  </div>
+
+  @if (loading()) {
+    <p class="status">Loading your news...</p>
+  } @else if (error() && stories().length === 0) {
+    <p class="status error">{{ error() }}</p>
+  } @else if (stories().length === 0) {
+    <p class="status">You have not written any news yet.</p>
+  } @else {
+    @if (error()) {
+      <p class="status error">{{ error() }}</p>
+    }
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Title</th>
+            <th>Category</th>
+            <th>Status</th>
+            <th>Published</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (story of stories(); track story.id) {
+            <tr>
+              <td class="title">
+                <a [routerLink]="['/news', story.id]">{{ story.title }}</a>
+              </td>
+              <td>{{ story.category }}</td>
+              <td>{{ story.isPublished ? 'Published' : 'Draft' }}</td>
+              <td>{{ timeAgo(story.publishedAt) }}</td>
+              <td class="actions">
+                <a [routerLink]="['/admin', story.id, 'edit']">Edit</a>
+                <button type="button" (click)="remove(story)" [disabled]="deletingId() === story.id">
+                  {{ deletingId() === story.id ? 'Deleting...' : 'Delete' }}
+                </button>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  }
+</section>

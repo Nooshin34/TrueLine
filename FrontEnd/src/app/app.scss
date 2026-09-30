@@ -46,14 +46,17 @@ nav a.active {
   font-weight: 700;
 }
 
-.write {
-  padding: 8px 14px;
-  border: 1px solid var(--input-border);
-  border-radius: 999px;
-  background: transparent;
-  color: var(--nav-active);
-  font: inherit;
-  text-decoration: none;
+.mark {
+  display: flex;
+  flex-shrink: 0;
+  width: 36px;
+  height: 36px;
+}
+
+.mark img {
+  display: block;
+  width: 36px;
+  height: 36px;
 }
 
 .nav-button {
@@ -62,11 +65,6 @@ nav a.active {
   background: transparent;
   font: inherit;
   cursor: pointer;
-}
-
-.account {
-  color: var(--nav-active);
-  font-weight: 650;
 }
 
 .theme {
@@ -241,9 +239,5 @@ nav a.active {
   .site-header {
     gap: 14px;
     padding: 14px 16px;
-  }
-
-  .write {
-    display: none;
   }
 }

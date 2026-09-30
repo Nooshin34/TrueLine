@@ -18,5 +18,9 @@ public class News
 
     public bool IsPublished { get; set; }
 
+    public int? UserId { get; set; }
+
+    public User? User { get; set; }
+
     public NewsImage? Image { get; set; }
 }

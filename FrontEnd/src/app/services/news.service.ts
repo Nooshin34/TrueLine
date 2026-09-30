@@ -3,6 +3,8 @@ import { Injectable, inject } from '@angular/core';
 import { Observable } from 'rxjs';
 import { News } from '../models/news';
 
+type NewsDraft = Omit<News, 'id' | 'imageUrl' | 'userId' | 'canEdit'>;
+
 @Injectable({ providedIn: 'root' })
 export class NewsService {
   private readonly http = inject(HttpClient);
@@ -16,7 +18,23 @@ export class NewsService {
     return this.http.get<News>(`${this.apiUrl}/${id}`);
   }
 
-  create(news: Omit<News, 'id' | 'imageUrl'>, image?: File | null): Observable<News> {
+  getMine(): Observable<News[]> {
+    return this.http.get<News[]>(`${this.apiUrl}/mine`);
+  }
+
+  create(news: NewsDraft, image?: File | null): Observable<News> {
+    return this.http.post<News>(this.apiUrl, this.toFormData(news, image));
+  }
+
+  update(id: number, news: NewsDraft, image?: File | null): Observable<News> {
+    return this.http.put<News>(`${this.apiUrl}/${id}`, this.toFormData(news, image));
+  }
+
+  delete(id: number): Observable<void> {
+    return this.http.delete<void>(`${this.apiUrl}/${id}`);
+  }
+
+  private toFormData(news: NewsDraft, image?: File | null): FormData {
     const data = new FormData();
     data.append('title', news.title);
     data.append('summary', news.summary ?? '');
@@ -29,14 +47,6 @@ export class NewsService {
       data.append('image', image);
     }
 
-    return this.http.post<News>(this.apiUrl, data);
-  }
-
-  update(id: number, news: Omit<News, 'id' | 'imageUrl'>): Observable<News> {
-    return this.http.put<News>(`${this.apiUrl}/${id}`, news);
-  }
-
-  delete(id: number): Observable<void> {
-    return this.http.delete<void>(`${this.apiUrl}/${id}`);
+    return data;
   }
 }

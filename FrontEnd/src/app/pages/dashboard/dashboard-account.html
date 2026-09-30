@@ -1,0 +1,16 @@
+<h2>Account</h2>
+
+@if (session(); as account) {
+  <dl>
+    <div>
+      <dt>Name</dt>
+      <dd>{{ account.name }}</dd>
+    </div>
+    <div>
+      <dt>Email</dt>
+      <dd>{{ account.email }}</dd>
+    </div>
+  </dl>
+}
+
+<button type="button" (click)="logout()">Log out</button>

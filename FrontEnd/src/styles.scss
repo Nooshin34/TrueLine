@@ -23,6 +23,10 @@
   --write-card-text: #ffffff;
   --error: #9b2335;
   --button-text: #ffffff;
+  --edit: #2457d6;
+  --edit-hover: #1b46b5;
+  --delete: #d0122d;
+  --delete-hover: #a50e24;
 }
 
 :root[data-theme='dark'] {
@@ -44,6 +48,10 @@
   --write-card-text: #f3f4f6;
   --error: #ff8d98;
   --button-text: #ffffff;
+  --edit: #3b82f6;
+  --edit-hover: #60a5fa;
+  --delete: #f43f5e;
+  --delete-hover: #fb7185;
 }
 
 body {
