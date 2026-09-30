@@ -40,11 +40,8 @@
 
     <label>
       Author
-      <input type="text" formControlName="author" />
+      <input type="text" formControlName="author" readonly />
     </label>
-    @if (form.controls.author.touched && form.controls.author.invalid) {
-      <p class="message error">Author is required and must be 100 characters or less.</p>
-    }
 
     <label>
       Category

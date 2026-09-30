@@ -37,6 +37,21 @@ textarea {
   border-radius: 10px;
   font: inherit;
   font-weight: 400;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+input[type='text']:focus,
+select:focus,
+textarea:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 18%, transparent);
+  outline: none;
+}
+
+input[type='text']:disabled {
+  background: var(--line);
+  color: var(--muted);
+  cursor: default;
 }
 
 .check {
@@ -49,13 +64,19 @@ textarea {
 button {
   justify-self: start;
   margin-top: 6px;
-  padding: 10px 16px;
+  padding: 10px 18px;
   border: 0;
   border-radius: 999px;
   background: var(--accent);
   color: var(--button-text);
   font: inherit;
   cursor: pointer;
+  transition: transform 0.15s ease, filter 0.15s ease;
+}
+
+button:hover:not(:disabled) {
+  transform: translateY(-1px);
+  filter: brightness(1.05);
 }
 
 button:disabled {

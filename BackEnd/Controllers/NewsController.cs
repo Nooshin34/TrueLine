@@ -121,7 +121,8 @@ public class NewsController : ControllerBase
         }
 
         var userId = CurrentUserId();
-        if (userId is null)
+        var author = await CurrentUserNameAsync(cancellationToken);
+        if (userId is null || string.IsNullOrWhiteSpace(author))
         {
             return Unauthorized();
         }
@@ -131,7 +132,7 @@ public class NewsController : ControllerBase
             Title = request.Title.Trim(),
             Summary = string.IsNullOrWhiteSpace(request.Summary) ? null : request.Summary.Trim(),
             Body = request.Body,
-            Author = request.Author.Trim(),
+            Author = author,
             Category = request.Category,
             PublishedAt = request.PublishedAt == default ? DateTime.UtcNow : request.PublishedAt,
             IsPublished = request.IsPublished,
@@ -180,7 +181,8 @@ public class NewsController : ControllerBase
             .Include(item => item.Image)
             .FirstOrDefaultAsync(item => item.Id == id, cancellationToken);
 
-        if (existing is null || existing.UserId != CurrentUserId())
+        var author = await CurrentUserNameAsync(cancellationToken);
+        if (existing is null || existing.UserId != CurrentUserId() || string.IsNullOrWhiteSpace(author))
         {
             return NotFound();
         }
@@ -188,7 +190,7 @@ public class NewsController : ControllerBase
         existing.Title = request.Title.Trim();
         existing.Summary = string.IsNullOrWhiteSpace(request.Summary) ? null : request.Summary.Trim();
         existing.Body = request.Body;
-        existing.Author = request.Author.Trim();
+        existing.Author = author;
         existing.Category = request.Category;
         existing.IsPublished = request.IsPublished;
         if (request.PublishedAt != default)
@@ -306,6 +308,20 @@ public class NewsController : ControllerBase
 
     private bool CanRead(News news) =>
         news.IsPublished || news.UserId == CurrentUserId();
+
+    private async Task<string?> CurrentUserNameAsync(CancellationToken cancellationToken)
+    {
+        var id = CurrentUserId();
+        if (id is null)
+        {
+            return null;
+        }
+
+        return await _db.Users
+            .Where(user => user.Id == id)
+            .Select(user => user.Name)
+            .FirstOrDefaultAsync(cancellationToken);
+    }
 
     private int? CurrentUserId()
     {

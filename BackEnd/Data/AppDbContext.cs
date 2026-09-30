@@ -91,6 +91,12 @@ public class AppDbContext : DbContext
                 .IsRequired()
                 .HasMaxLength(500);
 
+            user.Property(item => item.AvatarObjectKey)
+                .HasMaxLength(500);
+
+            user.Property(item => item.AvatarContentType)
+                .HasMaxLength(100);
+
             user.Property(item => item.CreatedAt)
                 .IsRequired();
         });

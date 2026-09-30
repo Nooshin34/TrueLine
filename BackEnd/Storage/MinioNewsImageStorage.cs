@@ -23,11 +23,29 @@ public class MinioNewsImageStorage : INewsImageStorage
         string contentType,
         CancellationToken cancellationToken)
     {
-        EnsureConfigured();
-        await EnsureBucketAsync(cancellationToken);
-
         var extension = ExtensionFor(contentType);
         var objectKey = $"news/{newsId}/{Guid.NewGuid():N}{extension}";
+        await SaveObjectAsync(objectKey, content, contentType, cancellationToken);
+        return objectKey;
+    }
+
+    public Task UploadObjectAsync(
+        string objectKey,
+        Stream content,
+        string contentType,
+        CancellationToken cancellationToken)
+    {
+        return SaveObjectAsync(objectKey, content, contentType, cancellationToken);
+    }
+
+    private async Task SaveObjectAsync(
+        string objectKey,
+        Stream content,
+        string contentType,
+        CancellationToken cancellationToken)
+    {
+        EnsureConfigured();
+        await EnsureBucketAsync(cancellationToken);
 
         await using var buffer = new MemoryStream();
         await content.CopyToAsync(buffer, cancellationToken);
@@ -41,8 +59,6 @@ public class MinioNewsImageStorage : INewsImageStorage
                 .WithObjectSize(buffer.Length)
                 .WithContentType(contentType),
             cancellationToken);
-
-        return objectKey;
     }
 
     public async Task<StoredNewsImage?> OpenAsync(string objectKey, CancellationToken cancellationToken)

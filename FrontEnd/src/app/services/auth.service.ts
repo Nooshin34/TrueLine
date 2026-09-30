@@ -1,6 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable, computed, inject, signal } from '@angular/core';
-import { Observable, tap } from 'rxjs';
+import { Observable, catchError, map, of, switchMap, tap } from 'rxjs';
 import { AuthResponse, AuthSession } from '../models/auth';
 
 const storageKey = 'trueline-session';
@@ -26,18 +26,80 @@ export class AuthService {
   }
 
   logout(): void {
+    this.clearAvatarUrl();
     localStorage.removeItem(storageKey);
     this.session.set(null);
   }
 
+  loadAvatar(): void {
+    const session = this.session();
+    if (!session || session.avatarUrl) {
+      return;
+    }
+
+    this.http.get(`${this.apiUrl}/avatar`, { responseType: 'blob' }).pipe(
+      map((blob) => URL.createObjectURL(blob)),
+      catchError(() => of(null)),
+    ).subscribe((url) => {
+      if (!url) {
+        return;
+      }
+
+      this.session.update((current) => current ? { ...current, hasAvatar: true, avatarUrl: url } : current);
+      this.persist();
+    });
+  }
+
+  uploadAvatar(file: File): Observable<void> {
+    const data = new FormData();
+    data.append('file', file);
+    return this.http.post(`${this.apiUrl}/avatar`, data, { responseType: 'text' }).pipe(
+      switchMap(() => this.http.get(`${this.apiUrl}/avatar`, { responseType: 'blob' })),
+      tap((blob) => {
+        this.clearAvatarUrl();
+        this.session.update((current) => current
+          ? { ...current, hasAvatar: true, avatarUrl: URL.createObjectURL(blob) }
+          : current);
+        this.persist();
+      }),
+      map(() => undefined),
+    );
+  }
+
   private store(response: AuthResponse): void {
-    const session: AuthSession = {
+    this.clearAvatarUrl();
+    this.session.set({
       token: response.token,
       name: response.name,
       email: response.email,
-    };
-    localStorage.setItem(storageKey, JSON.stringify(session));
-    this.session.set(session);
+      hasAvatar: response.hasAvatar,
+      avatarUrl: null,
+    });
+    this.persist();
+    if (response.hasAvatar) {
+      this.loadAvatar();
+    }
+  }
+
+  private persist(): void {
+    const session = this.session();
+    if (!session) {
+      return;
+    }
+
+    localStorage.setItem(storageKey, JSON.stringify({
+      token: session.token,
+      name: session.name,
+      email: session.email,
+      hasAvatar: session.hasAvatar,
+    }));
+  }
+
+  private clearAvatarUrl(): void {
+    const url = this.session()?.avatarUrl;
+    if (url?.startsWith('blob:')) {
+      URL.revokeObjectURL(url);
+    }
   }
 
   private read(): AuthSession | null {
@@ -47,8 +109,18 @@ export class AuthService {
     }
 
     try {
-      const session = JSON.parse(raw) as AuthSession;
-      return session.token ? session : null;
+      const session = JSON.parse(raw) as Partial<AuthSession>;
+      if (!session.token || !session.name || !session.email) {
+        return null;
+      }
+
+      return {
+        token: session.token,
+        name: session.name,
+        email: session.email,
+        hasAvatar: session.hasAvatar ?? false,
+        avatarUrl: null,
+      };
     } catch {
       return null;
     }

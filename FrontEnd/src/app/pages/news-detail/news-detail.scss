@@ -59,11 +59,12 @@
 .cover {
   display: flex;
   align-items: flex-end;
-  height: 320px;
-  margin: 18px 0 22px;
+  height: 360px;
+  margin: 22px 0 26px;
   padding: 20px;
-  border-radius: 16px;
+  border-radius: 18px;
   color: #fff;
+  box-shadow: 0 16px 36px rgba(22, 24, 29, 0.16);
   font-family: Georgia, "Palatino Linotype", Palatino, serif;
   font-size: 6rem;
   line-height: 0.8;
@@ -92,7 +93,8 @@
 .story h1 {
   margin: 10px 0 14px;
   font-size: clamp(2.2rem, 5vw, 3.4rem);
-  line-height: 1.12;
+  letter-spacing: -0.03em;
+  line-height: 1.08;
 }
 
 .dek {
@@ -109,9 +111,10 @@
 }
 
 .body {
+  max-width: 38rem;
   margin-top: 28px;
-  font-size: 1.12rem;
-  line-height: 1.75;
+  font-size: 1.14rem;
+  line-height: 1.8;
   white-space: pre-wrap;
 }
 

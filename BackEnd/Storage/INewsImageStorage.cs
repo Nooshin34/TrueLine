@@ -9,6 +9,12 @@ public interface INewsImageStorage
         string contentType,
         CancellationToken cancellationToken);
 
+    Task UploadObjectAsync(
+        string objectKey,
+        Stream content,
+        string contentType,
+        CancellationToken cancellationToken);
+
     Task<StoredNewsImage?> OpenAsync(string objectKey, CancellationToken cancellationToken);
 
     Task DeleteAsync(string objectKey, CancellationToken cancellationToken);

@@ -1,12 +1,14 @@
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using TrueLine.Api.Contracts;
 using TrueLine.Api.Data;
+using TrueLine.Api.Storage;
 using TrueLine.Backend.Entities;
 
 namespace TrueLine.Api.Controllers;
@@ -15,15 +17,31 @@ namespace TrueLine.Api.Controllers;
 [Route("api/[controller]")]
 public class AuthController : ControllerBase
 {
+    private const long MaxAvatarBytes = 2 * 1024 * 1024;
+
+    private static readonly HashSet<string> AllowedAvatarTypes = new(StringComparer.OrdinalIgnoreCase)
+    {
+        "image/jpeg",
+        "image/png",
+        "image/webp",
+        "image/gif",
+    };
+
     private readonly AppDbContext _db;
     private readonly IPasswordHasher<User> _passwords;
     private readonly IConfiguration _configuration;
+    private readonly INewsImageStorage _images;
 
-    public AuthController(AppDbContext db, IPasswordHasher<User> passwords, IConfiguration configuration)
+    public AuthController(
+        AppDbContext db,
+        IPasswordHasher<User> passwords,
+        IConfiguration configuration,
+        INewsImageStorage images)
     {
         _db = db;
         _passwords = passwords;
         _configuration = configuration;
+        _images = images;
     }
 
     [HttpPost("register")]
@@ -71,6 +89,95 @@ public class AuthController : ControllerBase
         return Ok(CreateResponse(user));
     }
 
+    [Authorize]
+    [HttpGet("avatar")]
+    public async Task<IActionResult> GetAvatar(CancellationToken cancellationToken)
+    {
+        var user = await CurrentUserAsync(cancellationToken);
+        if (user?.AvatarObjectKey is null)
+        {
+            return NotFound();
+        }
+
+        var stored = await _images.OpenAsync(user.AvatarObjectKey, cancellationToken);
+        if (stored is null)
+        {
+            return NotFound();
+        }
+
+        return File(stored.Content, user.AvatarContentType ?? "application/octet-stream");
+    }
+
+    [Authorize]
+    [HttpPost("avatar")]
+    [RequestSizeLimit(3 * 1024 * 1024)]
+    [RequestFormLimits(MultipartBodyLengthLimit = 3 * 1024 * 1024)]
+    public async Task<IActionResult> UploadAvatar(IFormFile? file, CancellationToken cancellationToken)
+    {
+        if (file is null || file.Length == 0 || file.Length > MaxAvatarBytes || !AllowedAvatarTypes.Contains(file.ContentType))
+        {
+            return BadRequest("Photo must be a JPG, PNG, WEBP, or GIF no larger than 2 MB.");
+        }
+
+        var user = await CurrentUserAsync(cancellationToken);
+        if (user is null)
+        {
+            return Unauthorized();
+        }
+
+        var extension = file.ContentType.ToLowerInvariant() switch
+        {
+            "image/jpeg" => ".jpg",
+            "image/png" => ".png",
+            "image/webp" => ".webp",
+            "image/gif" => ".gif",
+            _ => ".bin",
+        };
+        var objectKey = $"avatars/{user.Id}/{Guid.NewGuid():N}{extension}";
+
+        try
+        {
+            await using var stream = file.OpenReadStream();
+            await _images.UploadObjectAsync(objectKey, stream, file.ContentType, cancellationToken);
+        }
+        catch (Exception)
+        {
+            return Problem(
+                detail: "Could not store the image. Check that MinIO is running and the MinIO settings are filled in.",
+                statusCode: StatusCodes.Status502BadGateway);
+        }
+
+        var previousKey = user.AvatarObjectKey;
+        user.AvatarObjectKey = objectKey;
+        user.AvatarContentType = file.ContentType;
+        await _db.SaveChangesAsync(cancellationToken);
+
+        if (!string.IsNullOrWhiteSpace(previousKey))
+        {
+            try
+            {
+                await _images.DeleteAsync(previousKey, cancellationToken);
+            }
+            catch (Exception)
+            {
+            }
+        }
+
+        return NoContent();
+    }
+
+    private async Task<User?> CurrentUserAsync(CancellationToken cancellationToken)
+    {
+        var value = User.FindFirstValue(JwtRegisteredClaimNames.Sub)
+            ?? User.FindFirstValue(ClaimTypes.NameIdentifier);
+        if (!int.TryParse(value, out var id))
+        {
+            return null;
+        }
+
+        return await _db.Users.FirstOrDefaultAsync(item => item.Id == id, cancellationToken);
+    }
+
     private AuthResponse CreateResponse(User user)
     {
         var jwt = _configuration.GetSection("Jwt");
@@ -95,6 +202,7 @@ public class AuthController : ControllerBase
             Token = new JwtSecurityTokenHandler().WriteToken(token),
             Name = user.Name,
             Email = user.Email,
+            HasAvatar = user.AvatarObjectKey is not null,
         };
     }
 }

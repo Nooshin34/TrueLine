@@ -7,7 +7,6 @@
         <a routerLink="/admin/new" routerLinkActive="active">Write</a>
         @if (session()) {
           <a routerLink="/dashboard" routerLinkActive="active">Dashboard</a>
-          <button type="button" class="nav-button" (click)="logout()">Log out</button>
         } @else {
           <a routerLink="/login" routerLinkActive="active">Log in</a>
           <a routerLink="/register" routerLinkActive="active">Register</a>
@@ -33,6 +32,29 @@
           <span class="cloud cloud-night"></span>
         </span>
       </button>
+      @if (session(); as account) {
+        <div class="profile">
+          <button
+            type="button"
+            class="avatar"
+            (click)="toggleMenu()"
+            [attr.aria-expanded]="menuOpen()"
+            aria-label="Account menu"
+          >
+            @if (account.avatarUrl) {
+              <img [src]="account.avatarUrl" alt="" />
+            } @else {
+              <span>{{ initial(account.name) }}</span>
+            }
+          </button>
+          @if (menuOpen()) {
+            <button type="button" class="menu-backdrop" (click)="toggleMenu()" aria-label="Close account menu"></button>
+            <div class="menu">
+              <button type="button" class="menu-item" (click)="logout()">Log out</button>
+            </div>
+          }
+        </div>
+      }
       <a class="mark" routerLink="/" aria-label="TrueLine">
         <img src="favicon.svg" alt="" width="36" height="36" />
       </a>

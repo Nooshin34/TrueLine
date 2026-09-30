@@ -27,12 +27,20 @@ nav {
 
 nav a {
   padding: 10px 12px;
+  border-left: 3px solid transparent;
   border-radius: 12px;
   color: var(--nav);
   text-decoration: none;
+  transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+}
+
+nav a:hover {
+  background: color-mix(in srgb, var(--line) 70%, transparent);
+  color: var(--nav-active);
 }
 
 nav a.active {
+  border-left-color: var(--accent);
   background: var(--line);
   color: var(--nav-active);
   font-weight: 700;

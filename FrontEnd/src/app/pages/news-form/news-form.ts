@@ -3,6 +3,7 @@ import { Component, inject, OnDestroy, OnInit, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { NewsService } from '../../services/news.service';
+import { AuthService } from '../../services/auth.service';
 import { newsCategories, NewsCategory } from '../../models/news';
 
 @Component({
@@ -13,6 +14,7 @@ import { newsCategories, NewsCategory } from '../../models/news';
 })
 export class NewsForm implements OnInit, OnDestroy {
   private readonly newsService = inject(NewsService);
+  private readonly auth = inject(AuthService);
   private readonly router = inject(Router);
   private readonly route = inject(ActivatedRoute);
   private readonly formBuilder = inject(FormBuilder);
@@ -33,12 +35,14 @@ export class NewsForm implements OnInit, OnDestroy {
     title: ['', [Validators.required, Validators.maxLength(200)]],
     summary: ['', [Validators.maxLength(500)]],
     body: ['', [Validators.required]],
-    author: ['', [Validators.required, Validators.maxLength(100)]],
+    author: [{ value: '', disabled: true }, [Validators.required, Validators.maxLength(100)]],
     category: ['', [Validators.required]],
     isPublished: [true],
   });
 
   ngOnInit(): void {
+    this.form.controls.author.setValue(this.auth.session()?.name ?? '');
+
     const raw = this.route.snapshot.paramMap.get('id');
     if (!raw) {
       return;
@@ -69,7 +73,7 @@ export class NewsForm implements OnInit, OnDestroy {
           title: article.title,
           summary: article.summary ?? '',
           body: article.body,
-          author: article.author,
+          author: this.auth.session()?.name ?? article.author,
           category: article.category,
           isPublished: article.isPublished,
         });

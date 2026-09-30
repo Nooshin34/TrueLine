@@ -57,8 +57,20 @@
 body {
   margin: 0;
   font-family: "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  line-height: 1.5;
   color: var(--text);
-  background: var(--canvas);
+  background:
+    radial-gradient(900px 380px at 8% -8%, color-mix(in srgb, var(--accent) 16%, transparent), transparent 62%),
+    var(--canvas);
+}
+
+::selection {
+  background: color-mix(in srgb, var(--accent) 28%, transparent);
+}
+
+:focus-visible {
+  outline: 2px solid color-mix(in srgb, var(--accent) 70%, white);
+  outline-offset: 2px;
 }
 
 h1,

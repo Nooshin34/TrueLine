@@ -93,10 +93,22 @@ th {
   text-transform: uppercase;
 }
 
+tbody tr {
+  transition: background 0.15s ease;
+}
+
+tbody tr:hover {
+  background: color-mix(in srgb, var(--line) 70%, transparent);
+}
+
 .title a {
   color: inherit;
   font-weight: 700;
   text-decoration: none;
+}
+
+.title a:hover {
+  color: var(--accent);
 }
 
 .actions {

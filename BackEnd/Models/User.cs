@@ -10,5 +10,9 @@ public class User
 
     public string PasswordHash { get; set; } = string.Empty;
 
+    public string? AvatarObjectKey { get; set; }
+
+    public string? AvatarContentType { get; set; }
+
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 }

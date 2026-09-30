@@ -6,13 +6,16 @@
 .sheet {
   max-width: 1180px;
   margin: 0 auto;
-  overflow: hidden;
+  overflow: visible;
   background: var(--sheet);
-  border-radius: 18px;
+  border: 1px solid color-mix(in srgb, var(--line) 70%, transparent);
+  border-radius: 22px;
   box-shadow: var(--shadow);
 }
 
 .site-header {
+  position: relative;
+  z-index: 2;
   display: flex;
   align-items: center;
   gap: 28px;
@@ -39,6 +42,12 @@ nav a,
   color: var(--nav);
   font-size: 0.95rem;
   text-decoration: none;
+  transition: color 0.15s ease;
+}
+
+nav a:hover,
+.nav-button:hover {
+  color: var(--nav-active);
 }
 
 nav a.active {
@@ -57,6 +66,72 @@ nav a.active {
   display: block;
   width: 36px;
   height: 36px;
+}
+
+.profile {
+  position: relative;
+}
+
+.avatar {
+  display: grid;
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  overflow: hidden;
+  background: var(--accent);
+  color: #fff;
+  font: inherit;
+  font-weight: 700;
+  place-items: center;
+  cursor: pointer;
+}
+
+.avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.menu-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 3;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  cursor: default;
+}
+
+.menu {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  z-index: 4;
+  min-width: 168px;
+  padding: 6px;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: var(--sheet);
+  box-shadow: var(--shadow);
+}
+
+.menu-item {
+  display: block;
+  width: 100%;
+  padding: 8px 10px;
+  border: 0;
+  border-radius: 10px;
+  background: transparent;
+  color: var(--text);
+  font: inherit;
+  text-align: start;
+  cursor: pointer;
+}
+
+.menu-item:hover {
+  background: var(--line);
 }
 
 .nav-button {
