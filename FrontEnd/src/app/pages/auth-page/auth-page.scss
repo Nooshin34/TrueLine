@@ -1,0 +1,77 @@
+.page {
+  max-width: 480px;
+  margin: 0 auto;
+  padding: 36px 28px 56px;
+}
+
+.page h1 {
+  margin: 0 0 8px;
+  font-size: 2.4rem;
+}
+
+.intro,
+.switch {
+  margin-bottom: 22px;
+  color: var(--muted);
+}
+
+.switch {
+  margin-top: 18px;
+  margin-bottom: 0;
+}
+
+.switch a {
+  color: var(--accent);
+}
+
+form {
+  display: grid;
+  gap: 14px;
+}
+
+label {
+  display: grid;
+  gap: 6px;
+  font-weight: 650;
+}
+
+input {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid var(--input-border);
+  border-radius: 10px;
+  background: var(--input-bg);
+  color: var(--text);
+  font: inherit;
+  font-weight: 400;
+}
+
+button {
+  justify-self: start;
+  margin-top: 6px;
+  padding: 10px 16px;
+  border: 0;
+  border-radius: 999px;
+  background: var(--accent);
+  color: var(--button-text);
+  font: inherit;
+  cursor: pointer;
+}
+
+button:disabled {
+  opacity: 0.7;
+  cursor: default;
+}
+
+.message.error {
+  margin: 0;
+  color: var(--error);
+  font-weight: 500;
+}
+
+@media (max-width: 860px) {
+  .page {
+    padding-right: 16px;
+    padding-left: 16px;
+  }
+}

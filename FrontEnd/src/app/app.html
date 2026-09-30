@@ -5,6 +5,13 @@
       <nav>
         <a routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">Latest</a>
         <a routerLink="/admin/new" routerLinkActive="active">Write</a>
+        @if (session(); as account) {
+          <span class="account">{{ account.name }}</span>
+          <button type="button" class="nav-button" (click)="logout()">Log out</button>
+        } @else {
+          <a routerLink="/login" routerLinkActive="active">Log in</a>
+          <a routerLink="/register" routerLinkActive="active">Register</a>
+        }
       </nav>
       <button
         type="button"

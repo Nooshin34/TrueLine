@@ -13,6 +13,8 @@ public class AppDbContext : DbContext
 
     public DbSet<NewsImage> NewsImages { get; set; }
 
+    public DbSet<User> Users { get; set; }
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<News>(news =>
@@ -61,6 +63,29 @@ public class AppDbContext : DbContext
 
             image.HasIndex(item => item.NewsId)
                 .IsUnique();
+        });
+
+        modelBuilder.Entity<User>(user =>
+        {
+            user.HasKey(item => item.Id);
+
+            user.Property(item => item.Name)
+                .IsRequired()
+                .HasMaxLength(100);
+
+            user.Property(item => item.Email)
+                .IsRequired()
+                .HasMaxLength(256);
+
+            user.HasIndex(item => item.Email)
+                .IsUnique();
+
+            user.Property(item => item.PasswordHash)
+                .IsRequired()
+                .HasMaxLength(500);
+
+            user.Property(item => item.CreatedAt)
+                .IsRequired();
         });
     }
 }

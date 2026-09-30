@@ -1,0 +1,73 @@
+<section class="page">
+  @if (isRegister()) {
+    <h1>Create an account</h1>
+    <p class="intro">Anyone can read the news. An account is required to publish a story.</p>
+
+    <form [formGroup]="registerForm" (ngSubmit)="submitRegister()">
+      <label>
+        Name
+        <input type="text" formControlName="name" autocomplete="name" />
+      </label>
+      @if (registerForm.controls.name.touched && registerForm.controls.name.invalid) {
+        <p class="message error">Name is required.</p>
+      }
+
+      <label>
+        Email
+        <input type="email" formControlName="email" autocomplete="email" />
+      </label>
+      @if (registerForm.controls.email.touched && registerForm.controls.email.invalid) {
+        <p class="message error">Enter a valid email.</p>
+      }
+
+      <label>
+        Password
+        <input type="password" formControlName="password" autocomplete="new-password" />
+      </label>
+      @if (registerForm.controls.password.touched && registerForm.controls.password.invalid) {
+        <p class="message error">Password must be at least 8 characters.</p>
+      }
+
+      @if (error()) {
+        <p class="message error">{{ error() }}</p>
+      }
+
+      <button type="submit" [disabled]="saving()">
+        {{ saving() ? 'Creating...' : 'Register' }}
+      </button>
+    </form>
+
+    <p class="switch">Already have an account? <a routerLink="/login">Log in</a></p>
+  } @else {
+    <h1>Log in</h1>
+    <p class="intro">Sign in to publish a story.</p>
+
+    <form [formGroup]="loginForm" (ngSubmit)="submitLogin()">
+      <label>
+        Email
+        <input type="email" formControlName="email" autocomplete="email" />
+      </label>
+      @if (loginForm.controls.email.touched && loginForm.controls.email.invalid) {
+        <p class="message error">Enter a valid email.</p>
+      }
+
+      <label>
+        Password
+        <input type="password" formControlName="password" autocomplete="current-password" />
+      </label>
+      @if (loginForm.controls.password.touched && loginForm.controls.password.invalid) {
+        <p class="message error">Password is required.</p>
+      }
+
+      @if (error()) {
+        <p class="message error">{{ error() }}</p>
+      }
+
+      <button type="submit" [disabled]="saving()">
+        {{ saving() ? 'Signing in...' : 'Log in' }}
+      </button>
+    </form>
+
+    <p class="switch">New here? <a routerLink="/register">Create an account</a></p>
+  }
+</section>

@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using TrueLine.Api.Contracts;
@@ -80,6 +81,7 @@ public class NewsController : ControllerBase
         return File(stored.Content, image.ContentType);
     }
 
+    [Authorize]
     [HttpPost]
     [RequestSizeLimit(8 * 1024 * 1024)]
     [RequestFormLimits(MultipartBodyLengthLimit = 8 * 1024 * 1024)]
@@ -128,6 +130,7 @@ public class NewsController : ControllerBase
         return CreatedAtAction(nameof(GetById), new { id = news.Id }, ToResponse(news));
     }
 
+    [Authorize]
     [HttpPut("{id:int}")]
     public async Task<ActionResult<NewsResponse>> Update(int id, News news, CancellationToken cancellationToken)
     {
@@ -152,6 +155,7 @@ public class NewsController : ControllerBase
         return Ok(ToResponse(existing));
     }
 
+    [Authorize]
     [HttpDelete("{id:int}")]
     public async Task<IActionResult> Delete(int id, CancellationToken cancellationToken)
     {

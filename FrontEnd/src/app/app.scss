@@ -34,7 +34,8 @@ nav {
   gap: 18px;
 }
 
-nav a {
+nav a,
+.nav-button {
   color: var(--nav);
   font-size: 0.95rem;
   text-decoration: none;
@@ -53,6 +54,19 @@ nav a.active {
   color: var(--nav-active);
   font: inherit;
   text-decoration: none;
+}
+
+.nav-button {
+  padding: 0;
+  border: 0;
+  background: transparent;
+  font: inherit;
+  cursor: pointer;
+}
+
+.account {
+  color: var(--nav-active);
+  font-weight: 650;
 }
 
 .theme {
