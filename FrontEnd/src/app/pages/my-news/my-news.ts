@@ -2,12 +2,13 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { Component, inject, OnInit, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { News } from '../../models/news';
+import { Loading } from '../../loading/loading';
 import { timeAgo } from '../../news-format';
 import { NewsService } from '../../services/news.service';
 
 @Component({
   selector: 'app-my-news',
-  imports: [RouterLink],
+  imports: [RouterLink, Loading],
   templateUrl: './my-news.html',
   styleUrl: './my-news.scss',
 })

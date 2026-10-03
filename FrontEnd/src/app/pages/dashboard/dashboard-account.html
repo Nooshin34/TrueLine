@@ -2,10 +2,10 @@
 
 @if (session(); as account) {
   <div class="photo">
-    <div class="avatar">
-      @if (account.avatarUrl) {
+    <div class="avatar" [class.is-loading]="photoLoading()">
+      @if (account.avatarUrl && !uploading()) {
         <img [src]="account.avatarUrl" alt="" />
-      } @else {
+      } @else if (!photoLoading()) {
         <span>{{ initial(account.name) }}</span>
       }
     </div>

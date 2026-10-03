@@ -2,7 +2,7 @@
   <a class="back" routerLink="/">Latest</a>
 
   @if (loading()) {
-    <p class="status">Loading story...</p>
+    <app-loading kind="story" />
   } @else if (error()) {
     <p class="status error">{{ error() }}</p>
   } @else if (article(); as item) {

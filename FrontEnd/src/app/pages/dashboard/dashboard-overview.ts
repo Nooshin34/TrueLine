@@ -1,10 +1,11 @@
 import { Component, inject, OnInit, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
+import { Loading } from '../../loading/loading';
 import { NewsService } from '../../services/news.service';
 
 @Component({
   selector: 'app-dashboard-overview',
-  imports: [RouterLink],
+  imports: [RouterLink, Loading],
   templateUrl: './dashboard-overview.html',
   styleUrl: './dashboard-overview.scss',
 })

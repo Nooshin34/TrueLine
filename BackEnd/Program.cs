@@ -1,23 +1,18 @@
 using System.Text;
 using System.Text.Json.Serialization;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
-using Minio;
-using TrueLine.Api.Data;
-using TrueLine.Api.Storage;
-using TrueLine.Backend.Entities;
+using TrueLine.Api.Auth;
+using TrueLine.Application.Abstractions;
+using TrueLine.Application.Auth;
+using TrueLine.Application.Stories;
+using TrueLine.Infrastructure;
 
 var builder = WebApplication.CreateBuilder(args);
-
-// Add services to the container.
 
 builder.Services.AddControllers()
     .AddJsonOptions(options =>
         options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter()));
-builder.Services.AddDbContext<AppDbContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("Frontend", policy =>
@@ -25,30 +20,12 @@ builder.Services.AddCors(options =>
             .AllowAnyHeader()
             .AllowAnyMethod());
 });
-// Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
-builder.Services.Configure<MinioOptions>(builder.Configuration.GetSection("Minio"));
-builder.Services.AddSingleton<IMinioClient>(sp =>
-{
-    var options = sp.GetRequiredService<Microsoft.Extensions.Options.IOptions<MinioOptions>>().Value;
-    var endpoint = options.Endpoint
-        .Replace("https://", "", StringComparison.OrdinalIgnoreCase)
-        .Replace("http://", "", StringComparison.OrdinalIgnoreCase)
-        .TrimEnd('/');
-
-    var client = new MinioClient()
-        .WithEndpoint(endpoint)
-        .WithCredentials(options.AccessKey, options.SecretKey);
-
-    if (options.UseSsl)
-    {
-        client = client.WithSSL();
-    }
-
-    return client.Build();
-});
-builder.Services.AddScoped<INewsImageStorage, MinioNewsImageStorage>();
-builder.Services.AddSingleton<IPasswordHasher<User>, PasswordHasher<User>>();
+builder.Services.AddInfrastructure(builder.Configuration);
+builder.Services.AddHttpContextAccessor();
+builder.Services.AddScoped<ICurrentUser, HttpCurrentUser>();
+builder.Services.AddScoped<INewsService, NewsService>();
+builder.Services.AddScoped<IAuthService, AuthService>();
 
 var jwt = builder.Configuration.GetSection("Jwt");
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
@@ -69,7 +46,6 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();

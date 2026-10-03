@@ -2,7 +2,7 @@
 <p class="intro">A quick look at the stories on your desk.</p>
 
 @if (loading()) {
-  <p class="status">Loading...</p>
+  <app-loading kind="stats" />
 } @else if (error()) {
   <p class="status error">{{ error() }}</p>
 } @else {

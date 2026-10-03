@@ -1,5 +1,5 @@
 using System.ComponentModel.DataAnnotations;
-using TrueLine.Backend.Entities;
+using TrueLine.Domain.Entities;
 
 namespace TrueLine.Api.Contracts;
 

@@ -18,6 +18,10 @@ export class App implements OnInit {
   private readonly router = inject(Router);
   protected readonly theme = this.themes.theme;
   protected readonly session = this.auth.session;
+  protected readonly avatarLoading = computed(() => {
+    const account = this.session();
+    return !!account && account.hasAvatar && !account.avatarUrl;
+  });
   protected readonly menuOpen = signal(false);
   protected readonly categories = newsCategories;
   private readonly path = toSignal(

@@ -2,11 +2,12 @@ import { Component, inject, OnInit, signal } from '@angular/core';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { News } from '../../models/news';
 import { coverStyle, initial, readMinutes, timeAgo } from '../../news-format';
+import { Loading } from '../../loading/loading';
 import { NewsService } from '../../services/news.service';
 
 @Component({
   selector: 'app-news-detail',
-  imports: [RouterLink],
+  imports: [RouterLink, Loading],
   templateUrl: './news-detail.html',
   styleUrl: './news-detail.scss',
 })

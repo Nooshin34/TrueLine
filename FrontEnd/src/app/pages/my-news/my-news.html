@@ -8,7 +8,7 @@
   </div>
 
   @if (loading()) {
-    <p class="status">Loading your news...</p>
+    <app-loading kind="table" />
   } @else if (error() && stories().length === 0) {
     <p class="status error">{{ error() }}</p>
   } @else if (stories().length === 0) {

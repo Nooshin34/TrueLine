@@ -9,7 +9,7 @@
   </p>
 
   @if (loading()) {
-    <p class="intro">Loading story...</p>
+    <app-loading kind="form" />
   } @else if (unavailable()) {
     <p class="message error">{{ error() }}</p>
   } @else {

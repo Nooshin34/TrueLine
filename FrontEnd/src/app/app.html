@@ -37,13 +37,14 @@
           <button
             type="button"
             class="avatar"
+            [class.is-loading]="avatarLoading()"
             (click)="toggleMenu()"
             [attr.aria-expanded]="menuOpen()"
             aria-label="Account menu"
           >
             @if (account.avatarUrl) {
               <img [src]="account.avatarUrl" alt="" />
-            } @else {
+            } @else if (!account.hasAvatar) {
               <span>{{ initial(account.name) }}</span>
             }
           </button>

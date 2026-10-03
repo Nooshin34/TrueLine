@@ -1,0 +1,145 @@
+.loading {
+  position: relative;
+}
+
+.sr {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.shimmer {
+  display: block;
+  border-radius: 12px;
+  background: linear-gradient(
+    90deg,
+    var(--line) 20%,
+    color-mix(in srgb, var(--sheet) 55%, var(--line)) 50%,
+    var(--line) 80%
+  );
+  background-size: 220% 100%;
+  animation: shimmer 1.15s ease-in-out infinite;
+}
+
+.line {
+  height: 14px;
+}
+
+.line.short {
+  width: 34%;
+}
+
+.line.mid {
+  width: 62%;
+}
+
+.line.title {
+  width: 78%;
+  height: 28px;
+  border-radius: 10px;
+}
+
+.kind-home {
+  display: grid;
+  gap: 8px;
+  padding: 28px 28px 36px;
+}
+
+.feature {
+  display: grid;
+  grid-template-columns: minmax(220px, 340px) 1fr;
+  gap: 28px;
+  align-items: center;
+}
+
+.cover {
+  min-height: 280px;
+  border-radius: 16px;
+}
+
+.copy {
+  display: grid;
+  gap: 12px;
+}
+
+.cards {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 22px 16px;
+  padding-top: 18px;
+}
+
+.thumb {
+  height: 148px;
+  margin-bottom: 12px;
+  border-radius: 16px;
+}
+
+.kind-story {
+  display: grid;
+  gap: 12px;
+  margin-top: 18px;
+}
+
+.hero {
+  height: 360px;
+  border-radius: 16px;
+}
+
+.stats {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.stat {
+  height: 92px;
+  border-radius: 16px;
+}
+
+.rows {
+  display: grid;
+  gap: 10px;
+}
+
+.row {
+  height: 48px;
+  border-radius: 12px;
+}
+
+.fields {
+  display: grid;
+  gap: 14px;
+}
+
+.field {
+  height: 64px;
+}
+
+.field.tall {
+  height: 140px;
+}
+
+@media (max-width: 860px) {
+  .feature,
+  .cards,
+  .stats {
+    grid-template-columns: 1fr;
+  }
+
+  .kind-home {
+    padding: 20px 16px 28px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .shimmer {
+    animation: none;
+  }
+}

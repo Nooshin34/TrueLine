@@ -9,13 +9,15 @@
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="9.0.19" />
     <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="9.0.19" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="9.0.19" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="10.0.12">
-      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="9.0.19">
       <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="Microsoft.Extensions.Identity.Core" Version="9.0.19" />
-    <PackageReference Include="Minio" Version="6.0.5" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\src\TrueLine.Application\TrueLine.Application.csproj" />
+    <ProjectReference Include="..\src\TrueLine.Infrastructure\TrueLine.Infrastructure.csproj" />
   </ItemGroup>
 
 </Project>

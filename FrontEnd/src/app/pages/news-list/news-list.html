@@ -11,7 +11,7 @@
 }
 
 @if (loading()) {
-  <p class="status">Loading stories...</p>
+  <app-loading kind="home" />
 } @else if (error()) {
   <p class="status error">{{ error() }}</p>
 } @else if (stories().length === 0) {

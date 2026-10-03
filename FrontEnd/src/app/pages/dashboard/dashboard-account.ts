@@ -1,4 +1,4 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, computed, inject, signal } from '@angular/core';
 import { AuthService } from '../../services/auth.service';
 
 @Component({
@@ -10,6 +10,11 @@ export class DashboardAccount {
   private readonly auth = inject(AuthService);
   protected readonly session = this.auth.session;
   protected readonly error = signal<string | null>(null);
+  protected readonly uploading = signal(false);
+  protected readonly photoLoading = computed(() => {
+    const account = this.session();
+    return this.uploading() || (!!account?.hasAvatar && !account.avatarUrl);
+  });
 
   protected initial(name: string): string {
     return name.trim().charAt(0).toUpperCase() || '?';
@@ -35,8 +40,13 @@ export class DashboardAccount {
     }
 
     this.error.set(null);
+    this.uploading.set(true);
     this.auth.uploadAvatar(file).subscribe({
-      error: () => this.error.set('Could not save the photo.'),
+      next: () => this.uploading.set(false),
+      error: () => {
+        this.uploading.set(false);
+        this.error.set('Could not save the photo.');
+      },
     });
   }
 }

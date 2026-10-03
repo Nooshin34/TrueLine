@@ -4,11 +4,12 @@ import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { NewsService } from '../../services/news.service';
 import { AuthService } from '../../services/auth.service';
+import { Loading } from '../../loading/loading';
 import { newsCategories, NewsCategory } from '../../models/news';
 
 @Component({
   selector: 'app-news-form',
-  imports: [ReactiveFormsModule],
+  imports: [ReactiveFormsModule, Loading],
   templateUrl: './news-form.html',
   styleUrl: './news-form.scss',
 })

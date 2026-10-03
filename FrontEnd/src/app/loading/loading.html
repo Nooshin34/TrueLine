@@ -1,0 +1,55 @@
+<div class="loading" [class]="'loading kind-' + kind()" role="status" aria-live="polite">
+  <span class="sr">Loading</span>
+
+  @switch (kind()) {
+    @case ('home') {
+      <article class="feature">
+        <span class="shimmer cover"></span>
+        <span class="copy">
+          <span class="shimmer line short"></span>
+          <span class="shimmer line title"></span>
+          <span class="shimmer line"></span>
+          <span class="shimmer line mid"></span>
+        </span>
+      </article>
+      <div class="cards">
+        @for (card of homeCards; track card) {
+          <article>
+            <span class="shimmer thumb"></span>
+            <span class="shimmer line short"></span>
+            <span class="shimmer line title"></span>
+          </article>
+        }
+      </div>
+    }
+    @case ('story') {
+      <span class="shimmer hero"></span>
+      <span class="shimmer line short"></span>
+      <span class="shimmer line title"></span>
+      <span class="shimmer line"></span>
+      <span class="shimmer line"></span>
+      <span class="shimmer line mid"></span>
+    }
+    @case ('stats') {
+      <div class="stats">
+        @for (card of stats; track card) {
+          <span class="shimmer stat"></span>
+        }
+      </div>
+    }
+    @case ('table') {
+      <div class="rows">
+        @for (row of rows; track row) {
+          <span class="shimmer row"></span>
+        }
+      </div>
+    }
+    @case ('form') {
+      <div class="fields">
+        @for (field of fields; track field) {
+          <span class="shimmer field" [class.tall]="field === 3"></span>
+        }
+      </div>
+    }
+  }
+</div>
