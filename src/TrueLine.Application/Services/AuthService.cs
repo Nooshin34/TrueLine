@@ -1,9 +1,9 @@
-using TrueLine.Application.Abstractions;
-using TrueLine.Application.Common;
-using TrueLine.Application.Stories;
+using TrueLine.Application.Auth;
+using TrueLine.Application.Interfaces;
+using TrueLine.Domain.Dto;
 using TrueLine.Domain.Entities;
 
-namespace TrueLine.Application.Auth;
+namespace TrueLine.Application.Services;
 
 public interface IAuthService
 {

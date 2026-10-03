@@ -1,4 +1,4 @@
-namespace TrueLine.Application.Abstractions;
+namespace TrueLine.Application.Interfaces;
 
 public interface IPasswordHasher
 {

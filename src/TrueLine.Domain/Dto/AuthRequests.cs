@@ -1,6 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 
-namespace TrueLine.Api.Contracts;
+namespace TrueLine.Domain.Dto;
 
 public class RegisterRequest
 {

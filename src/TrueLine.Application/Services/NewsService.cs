@@ -1,8 +1,8 @@
-using TrueLine.Application.Abstractions;
-using TrueLine.Application.Common;
+using TrueLine.Application.Interfaces;
+using TrueLine.Domain.Dto;
 using TrueLine.Domain.Entities;
 
-namespace TrueLine.Application.Stories;
+namespace TrueLine.Application.Services;
 
 public interface INewsService
 {
@@ -399,7 +399,7 @@ public sealed class NewsService : INewsService
         foreach (var item in items)
         {
             var reads = item.ReporterId is int reporterId && totals.TryGetValue(reporterId, out var total) ? total : 0;
-            item.AuthorStars = JournalistRating.Stars(reads);
+            item.AuthorStars = Stars(reads);
         }
     }
 
@@ -417,4 +417,14 @@ public sealed class NewsService : INewsService
 
         return news.IsPublished && await _admins.IsCurrentAdminAsync(cancellationToken);
     }
+
+    private static int Stars(int totalReads) => totalReads switch
+    {
+        <= 0 => 0,
+        <= 4 => 1,
+        <= 14 => 2,
+        <= 39 => 3,
+        <= 99 => 4,
+        _ => 5,
+    };
 }

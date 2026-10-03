@@ -1,5 +1,5 @@
 using Microsoft.EntityFrameworkCore;
-using TrueLine.Application.Abstractions;
+using TrueLine.Application.Interfaces;
 using TrueLine.Domain.Entities;
 
 namespace TrueLine.Infrastructure.Persistence;

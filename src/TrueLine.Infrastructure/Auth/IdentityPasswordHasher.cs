@@ -1,7 +1,7 @@
 using System.Security.Cryptography;
 using System.Text;
 using Microsoft.AspNetCore.Identity;
-using TrueLine.Application.Abstractions;
+using TrueLine.Application.Interfaces;
 
 namespace TrueLine.Infrastructure.Auth;
 

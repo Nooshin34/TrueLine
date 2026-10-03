@@ -1,4 +1,4 @@
-namespace TrueLine.Domain.Entities;
+namespace TrueLine.Domain.Enums;
 
 public enum NewsCategory
 {

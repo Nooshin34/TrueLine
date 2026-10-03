@@ -1,8 +1,8 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using TrueLine.Api.Contracts;
-using TrueLine.Application.Abstractions;
-using TrueLine.Application.Stories;
+using TrueLine.Application.Interfaces;
+using TrueLine.Application.Services;
+using TrueLine.Domain.Dto;
 using TrueLine.Domain.Entities;
 
 namespace TrueLine.Api.Controllers;

@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using TrueLine.Domain.Entities;
+using TrueLine.Domain.Enums;
 
 namespace TrueLine.Infrastructure.Persistence;
 

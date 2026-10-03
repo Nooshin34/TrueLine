@@ -1,4 +1,4 @@
-namespace TrueLine.Application.Common;
+namespace TrueLine.Application.Services;
 
 public enum ServiceError
 {

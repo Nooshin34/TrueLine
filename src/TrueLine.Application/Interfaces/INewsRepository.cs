@@ -1,6 +1,6 @@
 using TrueLine.Domain.Entities;
 
-namespace TrueLine.Application.Abstractions;
+namespace TrueLine.Application.Interfaces;
 
 public interface INewsRepository
 {

@@ -2,7 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Minio;
-using TrueLine.Application.Abstractions;
+using TrueLine.Application.Interfaces;
 using TrueLine.Infrastructure.Auth;
 using TrueLine.Infrastructure.Persistence;
 using TrueLine.Infrastructure.Storage;

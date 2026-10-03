@@ -1,4 +1,4 @@
-namespace TrueLine.Application.Auth;
+namespace TrueLine.Domain.Dto;
 
 public sealed class RegisterCommand
 {

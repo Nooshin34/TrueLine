@@ -2,7 +2,7 @@ using Microsoft.Extensions.Options;
 using Minio;
 using Minio.DataModel.Args;
 using Minio.Exceptions;
-using TrueLine.Application.Abstractions;
+using TrueLine.Application.Interfaces;
 
 namespace TrueLine.Infrastructure.Storage;
 

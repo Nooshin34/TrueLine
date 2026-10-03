@@ -1,6 +1,6 @@
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
-using TrueLine.Application.Abstractions;
+using TrueLine.Application.Interfaces;
 using TrueLine.Application.Auth;
 
 namespace TrueLine.Api.Auth;

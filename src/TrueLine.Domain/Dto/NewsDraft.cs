@@ -1,6 +1,6 @@
-using TrueLine.Domain.Entities;
+using TrueLine.Domain.Enums;
 
-namespace TrueLine.Application.Stories;
+namespace TrueLine.Domain.Dto;
 
 public sealed class NewsDraft
 {

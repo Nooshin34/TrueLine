@@ -1,3 +1,5 @@
+using TrueLine.Domain.Enums;
+
 namespace TrueLine.Domain.Entities;
 
 public class News

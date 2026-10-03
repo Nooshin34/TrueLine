@@ -1,6 +1,6 @@
-using TrueLine.Application.Abstractions;
+using TrueLine.Application.Interfaces;
 
-namespace TrueLine.Application.Admins;
+namespace TrueLine.Application.Services;
 
 public sealed class AdminAccess : IAdminAccess
 {

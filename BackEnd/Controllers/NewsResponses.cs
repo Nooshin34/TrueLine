@@ -1,5 +1,5 @@
-using TrueLine.Api.Contracts;
-using TrueLine.Application.Abstractions;
+using TrueLine.Application.Interfaces;
+using TrueLine.Domain.Dto;
 using TrueLine.Domain.Entities;
 
 namespace TrueLine.Api.Controllers;

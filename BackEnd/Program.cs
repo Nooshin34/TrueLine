@@ -3,10 +3,8 @@ using System.Text.Json.Serialization;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using TrueLine.Api.Auth;
-using TrueLine.Application.Abstractions;
-using TrueLine.Application.Admins;
-using TrueLine.Application.Auth;
-using TrueLine.Application.Stories;
+using TrueLine.Application.Interfaces;
+using TrueLine.Application.Services;
 using TrueLine.Infrastructure;
 
 var builder = WebApplication.CreateBuilder(args);
