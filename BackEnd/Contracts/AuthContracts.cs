@@ -37,4 +37,6 @@ public class AuthResponse
     public string Email { get; set; } = string.Empty;
 
     public bool HasAvatar { get; set; }
+
+    public string Role { get; set; } = string.Empty;
 }

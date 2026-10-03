@@ -1,0 +1,17 @@
+:host {
+  display: inline-flex;
+  vertical-align: -1px;
+}
+
+.stars {
+  display: inline-flex;
+  gap: 1px;
+  color: color-mix(in srgb, var(--text) 28%, transparent);
+  font-size: 0.95rem;
+  line-height: 1;
+  letter-spacing: 0;
+}
+
+.on {
+  color: #e2a308;
+}

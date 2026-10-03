@@ -1,0 +1,86 @@
+.backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 40;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+  background: rgba(18, 20, 24, 0.48);
+}
+
+.card {
+  width: min(440px, 100%);
+  padding: 28px 28px 22px;
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  background: var(--sheet);
+  box-shadow: var(--shadow);
+}
+
+.kicker {
+  margin: 0;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.kicker.success {
+  color: #1f8a70;
+}
+
+.kicker.error,
+.kicker.confirm {
+  color: var(--error);
+}
+
+h2 {
+  margin: 8px 0 10px;
+  font-size: 1.85rem;
+  line-height: 1.15;
+}
+
+.message {
+  margin: 0;
+  color: var(--muted);
+  line-height: 1.5;
+}
+
+.actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 22px;
+}
+
+button {
+  padding: 10px 16px;
+  border: 0;
+  border-radius: 999px;
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.ghost {
+  background: transparent;
+  color: var(--text);
+}
+
+.ghost:hover {
+  background: var(--line);
+}
+
+.primary {
+  background: var(--accent);
+  color: var(--button-text);
+}
+
+.primary.danger {
+  background: var(--delete);
+}
+
+.primary.ok {
+  background: #1f8a70;
+  color: #fff;
+}

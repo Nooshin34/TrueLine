@@ -31,20 +31,23 @@ public sealed class AuthService : IAuthService
         "image/gif",
     };
 
-    private readonly IUserRepository _users;
+    private readonly IReporterRepository _reporters;
+    private readonly IAdminRepository _admins;
     private readonly IPasswordHasher _passwords;
     private readonly ITokenIssuer _tokens;
     private readonly INewsImageStorage _images;
     private readonly ICurrentUser _current;
 
     public AuthService(
-        IUserRepository users,
+        IReporterRepository reporters,
+        IAdminRepository admins,
         IPasswordHasher passwords,
         ITokenIssuer tokens,
         INewsImageStorage images,
         ICurrentUser current)
     {
-        _users = users;
+        _reporters = reporters;
+        _admins = admins;
         _passwords = passwords;
         _tokens = tokens;
         _images = images;
@@ -56,46 +59,59 @@ public sealed class AuthService : IAuthService
         var email = command.Email.Trim().ToLowerInvariant();
         var name = command.Name.Trim();
 
-        if (await _users.EmailExistsAsync(email, cancellationToken))
+        if (await _reporters.EmailExistsAsync(email, cancellationToken))
         {
             return ServiceResult<AuthSession>.Fail(ServiceError.Conflict, "An account with this email already exists.");
         }
 
-        var user = new User
+        var reporter = new Reporter
         {
             Name = name,
             Email = email,
             CreatedAt = DateTime.UtcNow,
+            PasswordHash = _passwords.Hash(command.Password),
         };
-        user.PasswordHash = _passwords.Hash(user, command.Password);
 
-        _users.Add(user);
-        await _users.SaveChangesAsync(cancellationToken);
+        _reporters.Add(reporter);
+        await _reporters.SaveChangesAsync(cancellationToken);
 
-        return ServiceResult<AuthSession>.Ok(SessionFor(user));
+        return ServiceResult<AuthSession>.Ok(SessionFor(reporter));
     }
 
     public async Task<ServiceResult<AuthSession>> LoginAsync(LoginCommand command, CancellationToken cancellationToken)
     {
         var email = command.Email.Trim().ToLowerInvariant();
-        var user = await _users.FindByEmailAsync(email, cancellationToken);
-        if (user is null || !_passwords.Verify(user, user.PasswordHash, command.Password))
+        var reporter = await _reporters.FindByEmailAsync(email, cancellationToken);
+        if (reporter is not null && _passwords.Verify(reporter.PasswordHash, command.Password))
         {
-            return ServiceResult<AuthSession>.Fail(ServiceError.Unauthorized, "Email or password is incorrect.");
+            return ServiceResult<AuthSession>.Ok(SessionFor(reporter));
         }
 
-        return ServiceResult<AuthSession>.Ok(SessionFor(user));
+        var admin = await _admins.FindByEmailAsync(email, cancellationToken);
+        if (admin is not null && _passwords.Verify(admin.PasswordHash, command.Password))
+        {
+            return ServiceResult<AuthSession>.Ok(new AuthSession
+            {
+                Token = _tokens.Create(admin.Id, admin.Email, admin.Name, AccountRoles.Admin),
+                Name = admin.Name,
+                Email = admin.Email,
+                HasAvatar = false,
+                Role = AccountRoles.Admin,
+            });
+        }
+
+        return ServiceResult<AuthSession>.Fail(ServiceError.Unauthorized, "Email or password is incorrect.");
     }
 
     public async Task<ServiceResult<NewsFile>> OpenAvatarAsync(CancellationToken cancellationToken)
     {
-        var user = await CurrentUserAsync(cancellationToken);
-        if (user?.AvatarObjectKey is null)
+        var reporter = await CurrentReporterAsync(cancellationToken);
+        if (reporter?.AvatarObjectKey is null)
         {
             return ServiceResult<NewsFile>.Fail(ServiceError.NotFound);
         }
 
-        var stored = await _images.OpenAsync(user.AvatarObjectKey, cancellationToken);
+        var stored = await _images.OpenAsync(reporter.AvatarObjectKey, cancellationToken);
         if (stored is null)
         {
             return ServiceResult<NewsFile>.Fail(ServiceError.NotFound);
@@ -104,7 +120,7 @@ public sealed class AuthService : IAuthService
         return ServiceResult<NewsFile>.Ok(new NewsFile
         {
             Content = stored.Content,
-            ContentType = user.AvatarContentType ?? "application/octet-stream",
+            ContentType = reporter.AvatarContentType ?? "application/octet-stream",
         });
     }
 
@@ -117,8 +133,8 @@ public sealed class AuthService : IAuthService
                 return ServiceResult.Fail(ServiceError.BadRequest, AvatarTypeError);
             }
 
-            var user = await CurrentUserAsync(cancellationToken);
-            if (user is null)
+            var reporter = await CurrentReporterAsync(cancellationToken);
+            if (reporter is null)
             {
                 return ServiceResult.Fail(ServiceError.Unauthorized);
             }
@@ -131,7 +147,7 @@ public sealed class AuthService : IAuthService
                 "image/gif" => ".gif",
                 _ => ".bin",
             };
-            var objectKey = $"avatars/{user.Id}/{Guid.NewGuid():N}{extension}";
+            var objectKey = $"avatars/{reporter.Id}/{Guid.NewGuid():N}{extension}";
 
             try
             {
@@ -142,10 +158,10 @@ public sealed class AuthService : IAuthService
                 return ServiceResult.Fail(ServiceError.StorageFailed, ImageStoreError);
             }
 
-            var previousKey = user.AvatarObjectKey;
-            user.AvatarObjectKey = objectKey;
-            user.AvatarContentType = file.ContentType;
-            await _users.SaveChangesAsync(cancellationToken);
+            var previousKey = reporter.AvatarObjectKey;
+            reporter.AvatarObjectKey = objectKey;
+            reporter.AvatarContentType = file.ContentType;
+            await _reporters.SaveChangesAsync(cancellationToken);
 
             if (!string.IsNullOrWhiteSpace(previousKey))
             {
@@ -169,21 +185,22 @@ public sealed class AuthService : IAuthService
         }
     }
 
-    private async Task<User?> CurrentUserAsync(CancellationToken cancellationToken)
+    private async Task<Reporter?> CurrentReporterAsync(CancellationToken cancellationToken)
     {
-        if (_current.Id is null)
+        if (_current.Id is null || !_current.IsReporter)
         {
             return null;
         }
 
-        return await _users.FindByIdAsync(_current.Id.Value, cancellationToken);
+        return await _reporters.FindByIdAsync(_current.Id.Value, cancellationToken);
     }
 
-    private AuthSession SessionFor(User user) => new()
+    private AuthSession SessionFor(Reporter reporter) => new()
     {
-        Token = _tokens.Create(user),
-        Name = user.Name,
-        Email = user.Email,
-        HasAvatar = user.AvatarObjectKey is not null,
+        Token = _tokens.Create(reporter.Id, reporter.Email, reporter.Name, AccountRoles.Reporter),
+        Name = reporter.Name,
+        Email = reporter.Email,
+        HasAvatar = reporter.AvatarObjectKey is not null,
+        Role = AccountRoles.Reporter,
     };
 }

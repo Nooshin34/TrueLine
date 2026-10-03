@@ -36,12 +36,12 @@
         }
       </a>
       <div class="feature-copy">
-        <p class="kicker">{{ lead.author }} · {{ timeAgo(lead.publishedAt) }}</p>
+        <p class="kicker">{{ lead.author }} <app-stars [value]="lead.authorStars" /> · {{ timeAgo(lead.publishedAt) }}</p>
         <h2><a [routerLink]="['/news', lead.id]">{{ lead.title }}</a></h2>
         @if (lead.summary) {
           <p class="dek">{{ lead.summary }}</p>
         }
-        <p class="foot">{{ lead.category }} · {{ readMinutes(lead.body) }} min read</p>
+        <p class="foot">{{ lead.category }} · {{ readMinutes(lead.body) }} min read · {{ lead.viewCount }} reads</p>
       </div>
     </article>
   }
@@ -67,12 +67,12 @@
                   <span>{{ initial(item.title) }}</span>
                 }
               </a>
-              <p class="kicker">{{ item.author }} · {{ timeAgo(item.publishedAt) }}</p>
+              <p class="kicker">{{ item.author }} <app-stars [value]="item.authorStars" /> · {{ timeAgo(item.publishedAt) }}</p>
               <h3><a [routerLink]="['/news', item.id]">{{ item.title }}</a></h3>
               @if (item.summary) {
                 <p class="dek">{{ item.summary }}</p>
               }
-              <p class="foot">{{ item.category }} · {{ readMinutes(item.body) }} min read</p>
+              <p class="foot">{{ item.category }} · {{ readMinutes(item.body) }} min read · {{ item.viewCount }} reads</p>
             </article>
           }
         </div>
@@ -99,7 +99,7 @@
                 }
               </span>
               <span>
-                <span class="kicker">{{ timeAgo(item.publishedAt) }}</span>
+                <span class="kicker">{{ timeAgo(item.publishedAt) }} · {{ item.viewCount }} reads</span>
                 <strong>{{ item.title }}</strong>
               </span>
             </a>

@@ -5,11 +5,12 @@ import { map } from 'rxjs';
 import { News, NewsCategory, newsCategories } from '../../models/news';
 import { coverStyle, initial, readMinutes, timeAgo } from '../../news-format';
 import { Loading } from '../../loading/loading';
+import { Stars } from '../../stars/stars';
 import { NewsService } from '../../services/news.service';
 
 @Component({
   selector: 'app-news-list',
-  imports: [RouterLink, Loading],
+  imports: [RouterLink, Loading, Stars],
   templateUrl: './news-list.html',
   styleUrl: './news-list.scss',
 })

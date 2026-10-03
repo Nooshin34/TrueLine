@@ -47,7 +47,13 @@ public class NewsResponse
 
     public bool IsPublished { get; set; }
 
-    public int? UserId { get; set; }
+    public bool IsApproved { get; set; }
+
+    public int ViewCount { get; set; }
+
+    public int AuthorStars { get; set; }
+
+    public int? ReporterId { get; set; }
 
     public bool CanEdit { get; set; }
 

@@ -4,6 +4,7 @@ export interface AuthSession {
   email: string;
   hasAvatar: boolean;
   avatarUrl: string | null;
+  role: 'reporter' | 'admin';
 }
 
 export interface AuthResponse {
@@ -11,4 +12,5 @@ export interface AuthResponse {
   name: string;
   email: string;
   hasAvatar: boolean;
+  role: 'reporter' | 'admin';
 }

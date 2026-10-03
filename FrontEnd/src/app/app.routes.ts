@@ -7,7 +7,9 @@ import { AuthPage } from './pages/auth-page/auth-page';
 import { Dashboard } from './pages/dashboard/dashboard';
 import { DashboardAccount } from './pages/dashboard/dashboard-account';
 import { DashboardOverview } from './pages/dashboard/dashboard-overview';
-import { authGuard } from './auth.guard';
+import { Review } from './pages/review/review';
+import { reporterGuard } from './reporter.guard';
+import { adminGuard } from './admin.guard';
 
 export const routes: Routes = [
   { path: '', component: NewsList },
@@ -18,7 +20,7 @@ export const routes: Routes = [
   {
     path: 'dashboard',
     component: Dashboard,
-    canActivate: [authGuard],
+    canActivate: [reporterGuard],
     children: [
       { path: '', pathMatch: 'full', redirectTo: 'overview' },
       { path: 'overview', component: DashboardOverview },
@@ -26,6 +28,7 @@ export const routes: Routes = [
       { path: 'account', component: DashboardAccount },
     ],
   },
-  { path: 'admin/new', component: NewsForm, canActivate: [authGuard] },
-  { path: 'admin/:id/edit', component: NewsForm, canActivate: [authGuard] },
+  { path: 'admin/new', component: NewsForm, canActivate: [reporterGuard] },
+  { path: 'admin/:id/edit', component: NewsForm, canActivate: [reporterGuard] },
+  { path: 'review', component: Review, canActivate: [adminGuard] },
 ];

@@ -13,7 +13,9 @@ public class AppDbContext : DbContext
 
     public DbSet<NewsImage> NewsImages { get; set; }
 
-    public DbSet<User> Users { get; set; }
+    public DbSet<Reporter> Reporters { get; set; }
+
+    public DbSet<Admin> Admins { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -39,12 +41,22 @@ public class AppDbContext : DbContext
                 .IsRequired()
                 .HasDefaultValue(NewsCategory.World);
 
-            news.HasOne(item => item.User)
+            news.Property(item => item.IsApproved)
+                .IsRequired()
+                .HasDefaultValue(false);
+
+            news.Property(item => item.ViewCount)
+                .IsRequired()
+                .HasDefaultValue(0);
+
+            news.Ignore(item => item.AuthorStars);
+
+            news.HasOne(item => item.Reporter)
                 .WithMany()
-                .HasForeignKey(item => item.UserId)
+                .HasForeignKey(item => item.ReporterId)
                 .OnDelete(DeleteBehavior.SetNull);
 
-            news.HasIndex(item => item.UserId);
+            news.HasIndex(item => item.ReporterId);
 
             news.HasOne(item => item.Image)
                 .WithOne(image => image.News)
@@ -72,32 +84,59 @@ public class AppDbContext : DbContext
                 .IsUnique();
         });
 
-        modelBuilder.Entity<User>(user =>
+        modelBuilder.Entity<Reporter>(reporter =>
         {
-            user.HasKey(item => item.Id);
+            reporter.ToTable("Reporters");
 
-            user.Property(item => item.Name)
+            reporter.HasKey(item => item.Id);
+
+            reporter.Property(item => item.Name)
                 .IsRequired()
                 .HasMaxLength(100);
 
-            user.Property(item => item.Email)
+            reporter.Property(item => item.Email)
                 .IsRequired()
                 .HasMaxLength(256);
 
-            user.HasIndex(item => item.Email)
+            reporter.HasIndex(item => item.Email)
                 .IsUnique();
 
-            user.Property(item => item.PasswordHash)
+            reporter.Property(item => item.PasswordHash)
                 .IsRequired()
                 .HasMaxLength(500);
 
-            user.Property(item => item.AvatarObjectKey)
+            reporter.Property(item => item.AvatarObjectKey)
                 .HasMaxLength(500);
 
-            user.Property(item => item.AvatarContentType)
+            reporter.Property(item => item.AvatarContentType)
                 .HasMaxLength(100);
 
-            user.Property(item => item.CreatedAt)
+            reporter.Property(item => item.CreatedAt)
+                .IsRequired();
+        });
+
+        modelBuilder.Entity<Admin>(admin =>
+        {
+            admin.ToTable("Admins");
+
+            admin.HasKey(item => item.Id);
+
+            admin.Property(item => item.Name)
+                .IsRequired()
+                .HasMaxLength(100);
+
+            admin.Property(item => item.Email)
+                .IsRequired()
+                .HasMaxLength(256);
+
+            admin.HasIndex(item => item.Email)
+                .IsUnique();
+
+            admin.Property(item => item.PasswordHash)
+                .IsRequired()
+                .HasMaxLength(500);
+
+            admin.Property(item => item.CreatedAt)
                 .IsRequired();
         });
     }

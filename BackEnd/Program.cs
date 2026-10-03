@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using TrueLine.Api.Auth;
 using TrueLine.Application.Abstractions;
+using TrueLine.Application.Admins;
 using TrueLine.Application.Auth;
 using TrueLine.Application.Stories;
 using TrueLine.Infrastructure;
@@ -24,6 +25,7 @@ builder.Services.AddOpenApi();
 builder.Services.AddInfrastructure(builder.Configuration);
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddScoped<ICurrentUser, HttpCurrentUser>();
+builder.Services.AddScoped<IAdminAccess, AdminAccess>();
 builder.Services.AddScoped<INewsService, NewsService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 

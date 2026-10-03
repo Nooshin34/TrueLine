@@ -7,6 +7,7 @@ public enum ServiceError
     BadRequest,
     Unauthorized,
     Conflict,
+    Forbidden,
     StorageFailed,
 }
 

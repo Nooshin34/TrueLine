@@ -25,4 +25,6 @@ public sealed class AuthSession
     public required string Email { get; init; }
 
     public bool HasAvatar { get; init; }
+
+    public required string Role { get; init; }
 }

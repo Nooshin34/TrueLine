@@ -19,7 +19,10 @@ export interface News {
   category: NewsCategory;
   publishedAt: string;
   isPublished: boolean;
-  userId: number | null;
+  isApproved: boolean;
+  viewCount: number;
+  authorStars: number;
+  reporterId: number | null;
   canEdit: boolean;
   imageUrl: string | null;
 }

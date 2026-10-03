@@ -84,6 +84,7 @@ public class AuthController : ControllerBase
         Name = session.Name,
         Email = session.Email,
         HasAvatar = session.HasAvatar,
+        Role = session.Role,
     };
 
     private static IncomingFile? ToFile(IFormFile? file)

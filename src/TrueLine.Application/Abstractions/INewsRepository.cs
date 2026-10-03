@@ -6,9 +6,17 @@ public interface INewsRepository
 {
     Task<IReadOnlyList<News>> ListPublishedAsync(CancellationToken cancellationToken);
 
+    Task<IReadOnlyList<News>> ListSubmittedAsync(CancellationToken cancellationToken);
+
     Task<IReadOnlyList<News>> ListByOwnerAsync(int userId, CancellationToken cancellationToken);
 
     Task<News?> FindAsync(int id, bool tracked, CancellationToken cancellationToken);
+
+    Task<int> IncrementViewCountAsync(int id, CancellationToken cancellationToken);
+
+    Task<IReadOnlyDictionary<int, int>> SumViewsByReporterAsync(
+        IReadOnlyCollection<int> userIds,
+        CancellationToken cancellationToken);
 
     void Add(News news);
 

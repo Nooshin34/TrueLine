@@ -6,6 +6,7 @@
 } @else if (error()) {
   <p class="status error">{{ error() }}</p>
 } @else {
+  <p class="rating"><app-stars [value]="stars()" /> {{ reads() }} reads</p>
   <div class="stats">
     <a class="stat" routerLink="/dashboard/news">
       <span>{{ total() }}</span>

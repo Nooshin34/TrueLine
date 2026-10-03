@@ -23,6 +23,10 @@
       <p class="dek">{{ item.summary }}</p>
     }
     <p class="foot">{{ item.category }} · {{ readMinutes(item.body) }} min read</p>
+    <p class="reads">
+      {{ item.viewCount }} reads
+      <app-stars [value]="item.authorStars" />
+    </p>
     @if (item.canEdit) {
       <div class="actions">
         <a [routerLink]="['/admin', item.id, 'edit']">Edit</a>
@@ -30,9 +34,6 @@
           {{ deleting() ? 'Deleting...' : 'Delete' }}
         </button>
       </div>
-      @if (actionError()) {
-        <p class="status error">{{ actionError() }}</p>
-      }
     }
     <p class="body">{{ item.body }}</p>
   }

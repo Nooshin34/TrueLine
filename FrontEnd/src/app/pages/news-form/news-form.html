@@ -4,7 +4,7 @@
     {{
       editing()
         ? 'Update the headline, deck, or story. A new photo replaces the current one.'
-        : 'File a headline, a short deck, and the story. Published items show on the front page.'
+        : 'File a headline, a short deck, and the story. It appears on the site after an admin approves it.'
     }}
   </p>
 
@@ -71,10 +71,6 @@
       <input type="checkbox" formControlName="isPublished" />
       Publish on the site
     </label>
-
-    @if (error()) {
-      <p class="message error">{{ error() }}</p>
-    }
 
     <button type="submit" [disabled]="saving()">
       {{ saving() ? 'Saving...' : editing() ? 'Save changes' : 'Save news' }}

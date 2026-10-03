@@ -1,10 +1,8 @@
-using TrueLine.Domain.Entities;
-
 namespace TrueLine.Application.Abstractions;
 
 public interface IPasswordHasher
 {
-    string Hash(User user, string password);
+    string Hash(string password);
 
-    bool Verify(User user, string passwordHash, string password);
+    bool Verify(string passwordHash, string password);
 }

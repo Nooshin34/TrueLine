@@ -18,9 +18,15 @@ public class News
 
     public bool IsPublished { get; set; }
 
-    public int? UserId { get; set; }
+    public bool IsApproved { get; set; }
 
-    public User? User { get; set; }
+    public int ViewCount { get; set; }
+
+    public int AuthorStars { get; set; }
+
+    public int? ReporterId { get; set; }
+
+    public Reporter? Reporter { get; set; }
 
     public NewsImage? Image { get; set; }
 }

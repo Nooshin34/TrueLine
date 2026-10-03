@@ -1,18 +1,21 @@
 import { Component, inject, OnInit, signal } from '@angular/core';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
+import { DialogService } from '../../dialog/dialog.service';
 import { News } from '../../models/news';
 import { coverStyle, initial, readMinutes, timeAgo } from '../../news-format';
 import { Loading } from '../../loading/loading';
+import { Stars } from '../../stars/stars';
 import { NewsService } from '../../services/news.service';
 
 @Component({
   selector: 'app-news-detail',
-  imports: [RouterLink, Loading],
+  imports: [RouterLink, Loading, Stars],
   templateUrl: './news-detail.html',
   styleUrl: './news-detail.scss',
 })
 export class NewsDetail implements OnInit {
   private readonly newsService = inject(NewsService);
+  private readonly dialog = inject(DialogService);
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
 
@@ -20,7 +23,6 @@ export class NewsDetail implements OnInit {
   protected readonly loading = signal(true);
   protected readonly deleting = signal(false);
   protected readonly error = signal<string | null>(null);
-  protected readonly actionError = signal<string | null>(null);
   protected readonly coverStyle = coverStyle;
   protected readonly initial = initial;
   protected readonly timeAgo = timeAgo;
@@ -48,19 +50,25 @@ export class NewsDetail implements OnInit {
 
   protected remove(): void {
     const article = this.article();
-    if (!article || !confirm(`Delete "${article.title}"?`)) {
+    if (!article) {
       return;
     }
 
-    this.deleting.set(true);
-    this.newsService.delete(article.id).subscribe({
-      next: () => {
-        this.router.navigate(['/dashboard/news']);
-      },
-      error: () => {
-        this.actionError.set('Could not delete the story.');
-        this.deleting.set(false);
-      },
+    this.dialog.confirm('Delete this story?', `"${article.title}" will be removed.`).then((accepted) => {
+      if (!accepted) {
+        return;
+      }
+
+      this.deleting.set(true);
+      this.newsService.delete(article.id).subscribe({
+        next: () => {
+          this.router.navigate(['/dashboard/news']);
+        },
+        error: () => {
+          this.deleting.set(false);
+          this.dialog.error('Could not delete the story', 'Try again in a moment.');
+        },
+      });
     });
   }
 }

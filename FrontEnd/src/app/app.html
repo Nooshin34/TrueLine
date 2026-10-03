@@ -4,14 +4,21 @@
       <a class="brand" routerLink="/">TrueLine</a>
       <nav>
         <a routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">Latest</a>
-        <a routerLink="/admin/new" routerLinkActive="active">Write</a>
-        @if (session()) {
+        @if (!isAdmin()) {
+          <a routerLink="/admin/new" routerLinkActive="active">Write</a>
+        }
+        @if (session() && !isAdmin()) {
           <a routerLink="/dashboard" routerLinkActive="active">Dashboard</a>
-        } @else {
+        }
+        @if (isAdmin()) {
+          <a routerLink="/review" routerLinkActive="active">Review by admin</a>
+        }
+        @if (!session()) {
           <a routerLink="/login" routerLinkActive="active">Log in</a>
           <a routerLink="/register" routerLinkActive="active">Register</a>
         }
       </nav>
+      <div class="tools">
       <button
         type="button"
         class="theme"
@@ -51,6 +58,10 @@
           @if (menuOpen()) {
             <button type="button" class="menu-backdrop" (click)="toggleMenu()" aria-label="Close account menu"></button>
             <div class="menu">
+              <div class="who">
+                <strong>{{ account.name }}</strong>
+                <span class="role">{{ account.role === 'admin' ? 'Admin' : 'Reporter' }}</span>
+              </div>
               <button type="button" class="menu-item" (click)="logout()">Log out</button>
             </div>
           }
@@ -59,6 +70,7 @@
       <a class="mark" routerLink="/" aria-label="TrueLine">
         <img src="favicon.svg" alt="" width="36" height="36" />
       </a>
+      </div>
     </header>
     @if (showTopics()) {
       <nav class="topics" aria-label="Categories">
@@ -68,7 +80,10 @@
             [queryParams]="{ category }"
             routerLinkActive="active"
             [routerLinkActiveOptions]="{ exact: true, queryParams: 'exact' }"
-          >{{ category }}</a>
+          >
+            <span class="topic-icon" [attr.data-topic]="category" aria-hidden="true"></span>
+            {{ category }}
+          </a>
         }
       </nav>
     }
@@ -77,3 +92,4 @@
     </main>
   </div>
 </div>
+<app-dialog />

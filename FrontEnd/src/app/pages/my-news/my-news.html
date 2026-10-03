@@ -3,6 +3,9 @@
     <div>
       <p class="eyebrow">Your desk</p>
       <h2>My news list</h2>
+      @if (stories().length > 0) {
+        <p class="rating"><app-stars [value]="stars()" /> {{ totalReads() }} reads</p>
+      }
     </div>
     <a class="write" routerLink="/admin/new">Write</a>
   </div>
@@ -24,6 +27,7 @@
             <th>Title</th>
             <th>Category</th>
             <th>Status</th>
+            <th>Reads</th>
             <th>Published</th>
             <th>Actions</th>
           </tr>
@@ -35,7 +39,8 @@
                 <a [routerLink]="['/news', story.id]">{{ story.title }}</a>
               </td>
               <td>{{ story.category }}</td>
-              <td>{{ story.isPublished ? 'Published' : 'Draft' }}</td>
+              <td>{{ story.isPublished ? (story.isApproved ? 'On the site' : 'Pending') : 'Draft' }}</td>
+              <td>{{ story.viewCount }}</td>
               <td>{{ timeAgo(story.publishedAt) }}</td>
               <td class="actions">
                 <a [routerLink]="['/admin', story.id, 'edit']">Edit</a>

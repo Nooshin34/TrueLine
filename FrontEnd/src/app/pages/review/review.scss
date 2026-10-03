@@ -1,0 +1,128 @@
+.page {
+  display: grid;
+  gap: 20px;
+  padding: 36px 28px 56px;
+}
+
+.eyebrow {
+  margin: 0 0 8px;
+  color: var(--accent);
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+h2,
+h3 {
+  margin: 0;
+}
+
+h2 {
+  font-size: 2rem;
+}
+
+.intro,
+.status {
+  margin: 0;
+  color: var(--muted);
+}
+
+.status.error {
+  color: var(--error);
+}
+
+.table-wrap {
+  overflow-x: auto;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+th,
+td {
+  padding: 14px 12px;
+  border-bottom: 1px solid var(--line);
+  text-align: start;
+  vertical-align: middle;
+}
+
+th {
+  color: var(--faint);
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+tbody tr:hover {
+  background: color-mix(in srgb, var(--line) 70%, transparent);
+}
+
+.title a {
+  color: inherit;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.title a:hover {
+  color: var(--accent);
+}
+
+.actions button,
+form button {
+  padding: 7px 14px;
+  border: 0;
+  border-radius: 999px;
+  background: var(--edit);
+  color: #fff;
+  font: inherit;
+  font-size: 0.86rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.actions button.undo {
+  background: var(--delete);
+}
+
+.actions button:disabled {
+  opacity: 0.7;
+  cursor: default;
+}
+
+ul {
+  margin: 0;
+  padding-left: 18px;
+}
+
+form {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: end;
+}
+
+label {
+  display: grid;
+  gap: 6px;
+  font-weight: 650;
+}
+
+input {
+  min-width: 240px;
+  padding: 10px 12px;
+  border: 1px solid var(--input-border);
+  border-radius: 12px;
+  background: var(--input-bg);
+  color: var(--text);
+  font: inherit;
+}
+
+@media (max-width: 860px) {
+  .page {
+    padding: 28px 16px 40px;
+  }
+}

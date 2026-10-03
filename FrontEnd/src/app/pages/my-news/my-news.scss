@@ -24,6 +24,14 @@ h2 {
   font-size: 2rem;
 }
 
+.rating {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 8px 0 0;
+  color: var(--muted);
+}
+
 .write {
   padding: 8px 14px;
   border: 0;

@@ -1,6 +1,6 @@
 namespace TrueLine.Domain.Entities;
 
-public class User
+public class Admin
 {
     public int Id { get; set; }
 
@@ -9,10 +9,6 @@ public class User
     public string Email { get; set; } = string.Empty;
 
     public string PasswordHash { get; set; } = string.Empty;
-
-    public string? AvatarObjectKey { get; set; }
-
-    public string? AvatarContentType { get; set; }
 
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 }

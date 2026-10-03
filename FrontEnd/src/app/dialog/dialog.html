@@ -1,0 +1,30 @@
+@if (dialog.current(); as item) {
+  <div class="backdrop" (click)="dialog.dismiss()">
+    <div
+      class="card"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="dialog-title"
+      (click)="$event.stopPropagation()"
+    >
+      <p class="kicker" [class]="item.kind">{{ item.kind }}</p>
+      <h2 id="dialog-title">{{ item.title }}</h2>
+      <p class="message">{{ item.message }}</p>
+      <div class="actions">
+        @if (item.kind === 'confirm') {
+          <button type="button" class="ghost" (click)="dialog.dismiss()">{{ item.cancelLabel }}</button>
+        }
+        <button
+          #acceptButton
+          type="button"
+          class="primary"
+          [class.danger]="item.kind === 'confirm'"
+          [class.ok]="item.kind === 'success'"
+          (click)="dialog.accept()"
+        >
+          {{ item.confirmLabel }}
+        </button>
+      </div>
+    </div>
+  </div>
+}

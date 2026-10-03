@@ -2,17 +2,17 @@ using TrueLine.Domain.Entities;
 
 namespace TrueLine.Application.Abstractions;
 
-public interface IUserRepository
+public interface IReporterRepository
 {
     Task<bool> EmailExistsAsync(string email, CancellationToken cancellationToken);
 
-    Task<User?> FindByEmailAsync(string email, CancellationToken cancellationToken);
+    Task<Reporter?> FindByEmailAsync(string email, CancellationToken cancellationToken);
 
-    Task<User?> FindByIdAsync(int id, CancellationToken cancellationToken);
+    Task<Reporter?> FindByIdAsync(int id, CancellationToken cancellationToken);
 
     Task<string?> FindNameAsync(int id, CancellationToken cancellationToken);
 
-    void Add(User user);
+    void Add(Reporter reporter);
 
     Task SaveChangesAsync(CancellationToken cancellationToken);
 }

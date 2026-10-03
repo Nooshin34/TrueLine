@@ -1,8 +1,6 @@
-using TrueLine.Domain.Entities;
-
 namespace TrueLine.Application.Abstractions;
 
 public interface ITokenIssuer
 {
-    string Create(User user);
+    string Create(int id, string email, string name, string role);
 }

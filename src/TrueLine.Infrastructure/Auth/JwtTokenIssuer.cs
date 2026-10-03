@@ -4,7 +4,6 @@ using System.Text;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using TrueLine.Application.Abstractions;
-using TrueLine.Domain.Entities;
 
 namespace TrueLine.Infrastructure.Auth;
 
@@ -17,7 +16,7 @@ public sealed class JwtTokenIssuer : ITokenIssuer
         _configuration = configuration;
     }
 
-    public string Create(User user)
+    public string Create(int id, string email, string name, string role)
     {
         var jwt = _configuration.GetSection("Jwt");
         var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwt["Key"]!));
@@ -29,9 +28,10 @@ public sealed class JwtTokenIssuer : ITokenIssuer
             audience: jwt["Audience"],
             claims:
             [
-                new Claim(JwtRegisteredClaimNames.Sub, user.Id.ToString()),
-                new Claim(JwtRegisteredClaimNames.Email, user.Email),
-                new Claim(ClaimTypes.Name, user.Name),
+                new Claim(JwtRegisteredClaimNames.Sub, id.ToString()),
+                new Claim(JwtRegisteredClaimNames.Email, email),
+                new Claim(ClaimTypes.Name, name),
+                new Claim("role", role),
             ],
             expires: expires,
             signingCredentials: credentials);

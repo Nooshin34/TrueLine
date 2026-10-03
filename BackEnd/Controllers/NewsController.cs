@@ -40,6 +40,45 @@ public class NewsController : ControllerBase
         return Ok(result.Value.Select(ToResponse));
     }
 
+    [Authorize]
+    [HttpGet("review")]
+    public async Task<ActionResult<IEnumerable<NewsResponse>>> GetReview(CancellationToken cancellationToken)
+    {
+        var result = await _news.GetReviewAsync(cancellationToken);
+        if (!result.Succeeded || result.Value is null)
+        {
+            return this.ToActionResult(result);
+        }
+
+        return Ok(result.Value.Select(ToResponse));
+    }
+
+    [Authorize]
+    [HttpPost("{id:int}/approve")]
+    public async Task<ActionResult<NewsResponse>> Approve(int id, CancellationToken cancellationToken)
+    {
+        var result = await _news.ApproveAsync(id, cancellationToken);
+        if (!result.Succeeded || result.Value is null)
+        {
+            return this.ToActionResult(result);
+        }
+
+        return Ok(ToResponse(result.Value));
+    }
+
+    [Authorize]
+    [HttpPost("{id:int}/unapprove")]
+    public async Task<ActionResult<NewsResponse>> Unapprove(int id, CancellationToken cancellationToken)
+    {
+        var result = await _news.UnapproveAsync(id, cancellationToken);
+        if (!result.Succeeded || result.Value is null)
+        {
+            return this.ToActionResult(result);
+        }
+
+        return Ok(ToResponse(result.Value));
+    }
+
     [HttpGet("{id:int}")]
     public async Task<ActionResult<NewsResponse>> GetById(int id, CancellationToken cancellationToken)
     {
@@ -108,7 +147,7 @@ public class NewsController : ControllerBase
     }
 
     private NewsResponse ToResponse(News news) =>
-        NewsResponses.From(news, _current.Id, Request);
+        NewsResponses.From(news, _current, Request);
 
     private static NewsDraft ToDraft(NewsWriteRequest request) => new()
     {

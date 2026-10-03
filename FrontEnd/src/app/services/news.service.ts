@@ -3,7 +3,7 @@ import { Injectable, inject } from '@angular/core';
 import { Observable } from 'rxjs';
 import { News } from '../models/news';
 
-type NewsDraft = Omit<News, 'id' | 'imageUrl' | 'userId' | 'canEdit'>;
+type NewsDraft = Omit<News, 'id' | 'imageUrl' | 'reporterId' | 'canEdit' | 'isApproved' | 'viewCount' | 'authorStars'>;
 
 @Injectable({ providedIn: 'root' })
 export class NewsService {
@@ -32,6 +32,18 @@ export class NewsService {
 
   delete(id: number): Observable<void> {
     return this.http.delete<void>(`${this.apiUrl}/${id}`);
+  }
+
+  getReview(): Observable<News[]> {
+    return this.http.get<News[]>(`${this.apiUrl}/review`);
+  }
+
+  approve(id: number): Observable<News> {
+    return this.http.post<News>(`${this.apiUrl}/${id}/approve`, {});
+  }
+
+  unapprove(id: number): Observable<News> {
+    return this.http.post<News>(`${this.apiUrl}/${id}/unapprove`, {});
   }
 
   private toFormData(news: NewsDraft, image?: File | null): FormData {

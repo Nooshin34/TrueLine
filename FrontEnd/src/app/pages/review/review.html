@@ -1,0 +1,59 @@
+<section class="page">
+  <div class="head">
+    <div>
+      <p class="eyebrow">Admin desk</p>
+      <h2>Review by admin</h2>
+    </div>
+  </div>
+  <p class="intro">A published story stays here until an admin approves it. Then it appears on the site.</p>
+
+  @if (loading()) {
+    <app-loading kind="table" />
+  } @else if (error() && stories().length === 0) {
+    <p class="status error">{{ error() }}</p>
+  } @else if (stories().length === 0) {
+    <p class="status">No stories are waiting for review.</p>
+  } @else {
+    @if (error()) {
+      <p class="status error">{{ error() }}</p>
+    }
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Title</th>
+            <th>Author</th>
+            <th>Reads</th>
+            <th>Category</th>
+            <th>Status</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (story of stories(); track story.id) {
+            <tr>
+              <td class="title">
+                <a [routerLink]="['/news', story.id]">{{ story.title }}</a>
+              </td>
+              <td class="author"><span>{{ story.author }}</span> <app-stars [value]="story.authorStars" /></td>
+              <td>{{ story.viewCount }}</td>
+              <td>{{ story.category }}</td>
+              <td>{{ story.isApproved ? 'Approved' : 'Pending' }}</td>
+              <td class="actions">
+                @if (story.isApproved) {
+                  <button type="button" class="undo" (click)="setApproval(story, false)" [disabled]="busyId() === story.id">
+                    {{ busyId() === story.id ? 'Saving...' : 'Return to pending' }}
+                  </button>
+                } @else {
+                  <button type="button" (click)="setApproval(story, true)" [disabled]="busyId() === story.id">
+                    {{ busyId() === story.id ? 'Saving...' : 'Approve' }}
+                  </button>
+                }
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  }
+</section>

@@ -2,6 +2,7 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { Component, inject, OnDestroy, OnInit, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
+import { DialogService } from '../../dialog/dialog.service';
 import { NewsService } from '../../services/news.service';
 import { AuthService } from '../../services/auth.service';
 import { Loading } from '../../loading/loading';
@@ -15,6 +16,7 @@ import { newsCategories, NewsCategory } from '../../models/news';
 })
 export class NewsForm implements OnInit, OnDestroy {
   private readonly newsService = inject(NewsService);
+  private readonly dialog = inject(DialogService);
   private readonly auth = inject(AuthService);
   private readonly router = inject(Router);
   private readonly route = inject(ActivatedRoute);
@@ -115,13 +117,21 @@ export class NewsForm implements OnInit, OnDestroy {
     this.error.set(null);
     save.subscribe({
       next: (saved) => {
-        this.router.navigate(['/news', saved.id]);
+        this.saving.set(false);
+        const message = !value.isPublished
+          ? 'The story is saved as a draft.'
+          : this.editing()
+            ? 'Your changes are saved.'
+            : 'The story is saved. It appears on the site after an admin approves it.';
+        this.dialog
+          .success(this.editing() ? 'Story updated' : 'Story saved', message)
+          .then(() => this.router.navigate(['/news', saved.id]));
       },
       error: (err: HttpErrorResponse) => {
         const body = err.error;
         const detail = typeof body === 'string' ? body : body?.detail;
-        this.error.set(typeof detail === 'string' ? detail : 'Could not save the news item.');
         this.saving.set(false);
+        this.dialog.error('Could not save the story', typeof detail === 'string' ? detail : 'Try again in a moment.');
       },
     });
   }

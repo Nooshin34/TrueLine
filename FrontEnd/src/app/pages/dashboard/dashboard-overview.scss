@@ -9,6 +9,14 @@ h2 {
   color: var(--muted);
 }
 
+.rating {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: -10px 0 22px;
+  color: var(--muted);
+}
+
 .status.error {
   color: var(--error);
 }

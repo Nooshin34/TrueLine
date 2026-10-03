@@ -18,8 +18,19 @@ public sealed class NewsRepository : INewsRepository
         return await _db.News
             .AsNoTracking()
             .Include(item => item.Image)
-            .Where(item => item.IsPublished)
+            .Where(item => item.IsPublished && item.IsApproved)
             .OrderByDescending(item => item.PublishedAt)
+            .ToListAsync(cancellationToken);
+    }
+
+    public async Task<IReadOnlyList<News>> ListSubmittedAsync(CancellationToken cancellationToken)
+    {
+        return await _db.News
+            .AsNoTracking()
+            .Include(item => item.Image)
+            .Where(item => item.IsPublished)
+            .OrderBy(item => item.IsApproved)
+            .ThenByDescending(item => item.PublishedAt)
             .ToListAsync(cancellationToken);
     }
 
@@ -28,7 +39,7 @@ public sealed class NewsRepository : INewsRepository
         return await _db.News
             .AsNoTracking()
             .Include(item => item.Image)
-            .Where(item => item.UserId == userId)
+            .Where(item => item.ReporterId == userId)
             .OrderByDescending(item => item.PublishedAt)
             .ToListAsync(cancellationToken);
     }
@@ -42,6 +53,36 @@ public sealed class NewsRepository : INewsRepository
         }
 
         return query.FirstOrDefaultAsync(item => item.Id == id, cancellationToken);
+    }
+
+    public async Task<int> IncrementViewCountAsync(int id, CancellationToken cancellationToken)
+    {
+        await _db.News
+            .Where(item => item.Id == id)
+            .ExecuteUpdateAsync(
+                setters => setters.SetProperty(item => item.ViewCount, item => item.ViewCount + 1),
+                cancellationToken);
+
+        return await _db.News
+            .Where(item => item.Id == id)
+            .Select(item => item.ViewCount)
+            .FirstAsync(cancellationToken);
+    }
+
+    public async Task<IReadOnlyDictionary<int, int>> SumViewsByReporterAsync(
+        IReadOnlyCollection<int> userIds,
+        CancellationToken cancellationToken)
+    {
+        if (userIds.Count == 0)
+        {
+            return new Dictionary<int, int>();
+        }
+
+        return await _db.News
+            .Where(item => item.ReporterId != null && userIds.Contains(item.ReporterId.Value))
+            .GroupBy(item => item.ReporterId!.Value)
+            .Select(group => new { UserId = group.Key, Views = group.Sum(item => item.ViewCount) })
+            .ToDictionaryAsync(group => group.UserId, group => group.Views, cancellationToken);
     }
 
     public void Add(News news) => _db.News.Add(news);

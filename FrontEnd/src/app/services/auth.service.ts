@@ -74,6 +74,7 @@ export class AuthService {
       email: response.email,
       hasAvatar: response.hasAvatar,
       avatarUrl: null,
+      role: response.role === 'admin' ? 'admin' : 'reporter',
     });
     this.persist();
     if (response.hasAvatar) {
@@ -92,6 +93,7 @@ export class AuthService {
       name: session.name,
       email: session.email,
       hasAvatar: session.hasAvatar,
+      role: session.role,
     }));
   }
 
@@ -120,6 +122,7 @@ export class AuthService {
         email: session.email,
         hasAvatar: session.hasAvatar ?? false,
         avatarUrl: null,
+        role: session.role === 'admin' ? 'admin' : 'reporter',
       };
     } catch {
       return null;

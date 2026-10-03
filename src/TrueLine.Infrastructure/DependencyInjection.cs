@@ -17,7 +17,8 @@ public static class DependencyInjection
             options.UseSqlServer(configuration.GetConnectionString("DefaultConnection")));
 
         services.AddScoped<INewsRepository, NewsRepository>();
-        services.AddScoped<IUserRepository, UserRepository>();
+        services.AddScoped<IReporterRepository, ReporterRepository>();
+        services.AddScoped<IAdminRepository, AdminRepository>();
         services.AddSingleton<IPasswordHasher, IdentityPasswordHasher>();
         services.AddSingleton<ITokenIssuer, JwtTokenIssuer>();
 
