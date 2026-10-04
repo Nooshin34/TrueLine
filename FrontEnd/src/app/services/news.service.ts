@@ -3,7 +3,10 @@ import { Injectable, inject } from '@angular/core';
 import { Observable } from 'rxjs';
 import { News } from '../models/news';
 
-type NewsDraft = Omit<News, 'id' | 'imageUrl' | 'reporterId' | 'canEdit' | 'isApproved' | 'viewCount' | 'authorStars'>;
+type NewsDraft = Omit<
+  News,
+  'id' | 'imageUrl' | 'images' | 'reporterId' | 'canEdit' | 'isApproved' | 'viewCount' | 'authorStars'
+>;
 
 @Injectable({ providedIn: 'root' })
 export class NewsService {
@@ -22,12 +25,12 @@ export class NewsService {
     return this.http.get<News[]>(`${this.apiUrl}/mine`);
   }
 
-  create(news: NewsDraft, image?: File | null): Observable<News> {
-    return this.http.post<News>(this.apiUrl, this.toFormData(news, image));
+  create(news: NewsDraft, images: File[]): Observable<News> {
+    return this.http.post<News>(this.apiUrl, this.toFormData(news, images, []));
   }
 
-  update(id: number, news: NewsDraft, image?: File | null): Observable<News> {
-    return this.http.put<News>(`${this.apiUrl}/${id}`, this.toFormData(news, image));
+  update(id: number, news: NewsDraft, images: File[], keepImageIds: number[]): Observable<News> {
+    return this.http.put<News>(`${this.apiUrl}/${id}`, this.toFormData(news, images, keepImageIds));
   }
 
   delete(id: number): Observable<void> {
@@ -46,7 +49,7 @@ export class NewsService {
     return this.http.post<News>(`${this.apiUrl}/${id}/unapprove`, {});
   }
 
-  private toFormData(news: NewsDraft, image?: File | null): FormData {
+  private toFormData(news: NewsDraft, images: File[], keepImageIds: number[]): FormData {
     const data = new FormData();
     data.append('title', news.title);
     data.append('summary', news.summary ?? '');
@@ -55,8 +58,11 @@ export class NewsService {
     data.append('category', news.category);
     data.append('publishedAt', news.publishedAt);
     data.append('isPublished', String(news.isPublished));
-    if (image) {
-      data.append('image', image);
+    for (const image of images) {
+      data.append('images', image);
+    }
+    for (const id of keepImageIds) {
+      data.append('keepImageIds', String(id));
     }
 
     return data;

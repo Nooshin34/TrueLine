@@ -8,11 +8,29 @@
   } @else if (article(); as item) {
     <div
       class="cover"
-      [class.has-photo]="item.imageUrl"
-      [style.background]="item.imageUrl ? null : coverStyle(item.title)"
+      [class.has-photo]="item.images.length > 0"
+      [style.background]="item.images.length > 0 ? null : coverStyle(item.title)"
     >
-      @if (item.imageUrl) {
-        <img [src]="item.imageUrl" [alt]="item.title" />
+      @if (item.images.length > 0) {
+        <img [src]="item.images[slide()].url" [alt]="item.title" />
+        @if (item.images.length > 1) {
+          <button type="button" class="slide-nav prev" (click)="previousPhoto(item.images.length)" aria-label="Previous photo">
+            ‹
+          </button>
+          <button type="button" class="slide-nav next" (click)="nextPhoto(item.images.length)" aria-label="Next photo">
+            ›
+          </button>
+          <div class="dots">
+            @for (image of item.images; track image.id; let index = $index) {
+              <button
+                type="button"
+                [class.active]="index === slide()"
+                (click)="showPhoto(index)"
+                [attr.aria-label]="'Photo ' + (index + 1)"
+              ></button>
+            }
+          </div>
+        }
       } @else {
         <span>{{ initial(item.title) }}</span>
       }

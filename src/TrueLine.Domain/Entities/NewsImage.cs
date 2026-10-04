@@ -13,4 +13,6 @@ public class NewsImage
     public string ContentType { get; set; } = string.Empty;
 
     public string OriginalFileName { get; set; } = string.Empty;
+
+    public int SortOrder { get; set; }
 }

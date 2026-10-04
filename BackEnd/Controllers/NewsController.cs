@@ -92,24 +92,20 @@ public class NewsController : ControllerBase
     }
 
     [HttpGet("{id:int}/image")]
-    public async Task<IActionResult> GetImage(int id, CancellationToken cancellationToken)
-    {
-        var result = await _news.OpenImageAsync(id, cancellationToken);
-        if (!result.Succeeded || result.Value is null)
-        {
-            return this.ToActionResult(result);
-        }
+    public Task<IActionResult> GetImage(int id, CancellationToken cancellationToken) =>
+        OpenImage(id, null, cancellationToken);
 
-        return File(result.Value.Content, result.Value.ContentType);
-    }
+    [HttpGet("{id:int}/images/{imageId:int}")]
+    public Task<IActionResult> GetImage(int id, int imageId, CancellationToken cancellationToken) =>
+        OpenImage(id, imageId, cancellationToken);
 
     [Authorize]
     [HttpPost]
-    [RequestSizeLimit(8 * 1024 * 1024)]
-    [RequestFormLimits(MultipartBodyLengthLimit = 8 * 1024 * 1024)]
+    [RequestSizeLimit(32 * 1024 * 1024)]
+    [RequestFormLimits(MultipartBodyLengthLimit = 32 * 1024 * 1024)]
     public async Task<ActionResult<NewsResponse>> Create([FromForm] NewsWriteRequest request, CancellationToken cancellationToken)
     {
-        var result = await _news.CreateAsync(ToDraft(request), ToFile(request.Image), cancellationToken);
+        var result = await _news.CreateAsync(ToDraft(request), ToFiles(request.Images), cancellationToken);
         if (!result.Succeeded || result.Value is null)
         {
             return this.ToActionResult(result);
@@ -120,11 +116,11 @@ public class NewsController : ControllerBase
 
     [Authorize]
     [HttpPut("{id:int}")]
-    [RequestSizeLimit(8 * 1024 * 1024)]
-    [RequestFormLimits(MultipartBodyLengthLimit = 8 * 1024 * 1024)]
+    [RequestSizeLimit(32 * 1024 * 1024)]
+    [RequestFormLimits(MultipartBodyLengthLimit = 32 * 1024 * 1024)]
     public async Task<ActionResult<NewsResponse>> Update(int id, [FromForm] NewsWriteRequest request, CancellationToken cancellationToken)
     {
-        var result = await _news.UpdateAsync(id, ToDraft(request), ToFile(request.Image), cancellationToken);
+        var result = await _news.UpdateAsync(id, ToDraft(request), ToFiles(request.Images), request.KeepImageIds, cancellationToken);
         if (!result.Succeeded || result.Value is null)
         {
             return this.ToActionResult(result);
@@ -159,19 +155,41 @@ public class NewsController : ControllerBase
         IsPublished = request.IsPublished,
     };
 
-    private static IncomingFile? ToFile(IFormFile? file)
+    private async Task<IActionResult> OpenImage(int id, int? imageId, CancellationToken cancellationToken)
     {
-        if (file is null || file.Length == 0)
+        var result = await _news.OpenImageAsync(id, imageId, cancellationToken);
+        if (!result.Succeeded || result.Value is null)
         {
-            return null;
+            return this.ToActionResult(result);
         }
 
-        return new IncomingFile
+        return File(result.Value.Content, result.Value.ContentType);
+    }
+
+    private static List<IncomingFile> ToFiles(IEnumerable<IFormFile>? files)
+    {
+        var images = new List<IncomingFile>();
+        if (files is null)
         {
-            Content = file.OpenReadStream(),
-            Length = file.Length,
-            ContentType = file.ContentType,
-            FileName = file.FileName,
-        };
+            return images;
+        }
+
+        foreach (var file in files)
+        {
+            if (file.Length == 0)
+            {
+                continue;
+            }
+
+            images.Add(new IncomingFile
+            {
+                Content = file.OpenReadStream(),
+                Length = file.Length,
+                ContentType = file.ContentType,
+                FileName = file.FileName,
+            });
+        }
+
+        return images;
     }
 }

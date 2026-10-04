@@ -30,5 +30,5 @@ public class News
 
     public Reporter? Reporter { get; set; }
 
-    public NewsImage? Image { get; set; }
+    public List<NewsImage> Images { get; set; } = [];
 }

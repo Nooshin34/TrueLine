@@ -10,6 +10,11 @@ export const newsCategories = [
 
 export type NewsCategory = (typeof newsCategories)[number];
 
+export interface NewsImage {
+  id: number;
+  url: string;
+}
+
 export interface News {
   id: number;
   title: string;
@@ -25,4 +30,5 @@ export interface News {
   reporterId: number | null;
   canEdit: boolean;
   imageUrl: string | null;
+  images: NewsImage[];
 }

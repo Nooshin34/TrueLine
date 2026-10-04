@@ -2,12 +2,17 @@ using System.Text;
 using System.Text.Json.Serialization;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
-using TrueLine.Api.Auth;
+using TrueLine.Api.Controllers;
 using TrueLine.Application.Interfaces;
 using TrueLine.Application.Services;
 using TrueLine.Infrastructure;
 
 var builder = WebApplication.CreateBuilder(args);
+
+builder.WebHost.ConfigureKestrel(options =>
+{
+    options.Limits.MaxRequestBodySize = 32 * 1024 * 1024;
+});
 
 builder.Services.AddControllers()
     .AddJsonOptions(options =>

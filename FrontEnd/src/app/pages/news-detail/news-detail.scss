@@ -57,6 +57,7 @@
 }
 
 .cover {
+  position: relative;
   display: flex;
   align-items: flex-end;
   height: 360px;
@@ -68,6 +69,58 @@
   font-family: Georgia, "Palatino Linotype", Palatino, serif;
   font-size: 6rem;
   line-height: 0.8;
+}
+
+.slide-nav {
+  position: absolute;
+  top: 50%;
+  width: 40px;
+  height: 40px;
+  border: 0;
+  border-radius: 999px;
+  background: rgba(22, 24, 29, 0.55);
+  color: #fff;
+  font-size: 1.8rem;
+  line-height: 1;
+  cursor: pointer;
+  transform: translateY(-50%);
+}
+
+.slide-nav.prev {
+  left: 12px;
+}
+
+.slide-nav.next {
+  right: 12px;
+}
+
+.slide-nav:hover {
+  background: rgba(22, 24, 29, 0.78);
+}
+
+.dots {
+  position: absolute;
+  right: 0;
+  bottom: 14px;
+  left: 0;
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+}
+
+.dots button {
+  width: 9px;
+  height: 9px;
+  padding: 0;
+  border: 0;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.55);
+  font-size: 0;
+  cursor: pointer;
+}
+
+.dots button.active {
+  background: #fff;
 }
 
 .cover.has-photo {

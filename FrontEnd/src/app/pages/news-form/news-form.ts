@@ -23,15 +23,15 @@ export class NewsForm implements OnInit, OnDestroy {
   private readonly formBuilder = inject(FormBuilder);
   private articleId: number | null = null;
   private publishedAt = new Date().toISOString();
+  private photoKey = 0;
 
   protected readonly editing = signal(false);
   protected readonly loading = signal(false);
   protected readonly unavailable = signal(false);
   protected readonly saving = signal(false);
   protected readonly error = signal<string | null>(null);
-  protected readonly imageFile = signal<File | null>(null);
   protected readonly imageError = signal<string | null>(null);
-  protected readonly previewUrl = signal<string | null>(null);
+  protected readonly photos = signal<StoryPhoto[]>([]);
   protected readonly categories = newsCategories;
 
   protected readonly form = this.formBuilder.nonNullable.group({
@@ -80,9 +80,14 @@ export class NewsForm implements OnInit, OnDestroy {
           category: article.category,
           isPublished: article.isPublished,
         });
-        if (article.imageUrl) {
-          this.previewUrl.set(article.imageUrl);
-        }
+        this.photos.set(
+          (article.images ?? []).map((image) => ({
+            key: `saved-${image.id}`,
+            id: image.id,
+            url: image.url,
+            file: null,
+          })),
+        );
         this.loading.set(false);
       },
       error: () => {
@@ -94,7 +99,13 @@ export class NewsForm implements OnInit, OnDestroy {
   }
 
   protected submit(): void {
-    if (this.form.invalid || this.imageError()) {
+    if (this.photos().length < 1) {
+      this.imageError.set('Add at least one photo.');
+    } else if (this.photos().length > 5) {
+      this.imageError.set('A story can have at most 5 photos.');
+    }
+
+    if (this.form.invalid || this.photos().length < 1 || this.photos().length > 5) {
       this.form.markAllAsTouched();
       return;
     }
@@ -109,9 +120,11 @@ export class NewsForm implements OnInit, OnDestroy {
       publishedAt: this.editing() ? this.publishedAt : new Date().toISOString(),
       isPublished: value.isPublished,
     };
+    const files = this.photos().flatMap((photo) => (photo.file ? [photo.file] : []));
+    const keepIds = this.photos().flatMap((photo) => (photo.id === null ? [] : [photo.id]));
     const save = this.articleId
-      ? this.newsService.update(this.articleId, draft, this.imageFile())
-      : this.newsService.create(draft, this.imageFile());
+      ? this.newsService.update(this.articleId, draft, files, keepIds)
+      : this.newsService.create(draft, files);
 
     this.saving.set(true);
     this.error.set(null);
@@ -136,46 +149,74 @@ export class NewsForm implements OnInit, OnDestroy {
     });
   }
 
-  protected onImageSelected(event: Event): void {
+  protected onImagesSelected(event: Event): void {
     const input = event.target as HTMLInputElement;
-    const file = input.files?.[0] ?? null;
-    this.clearPreview();
-
-    if (!file) {
-      this.imageFile.set(null);
-      this.imageError.set(null);
+    const files = Array.from(input.files ?? []);
+    input.value = '';
+    if (files.length === 0) {
       return;
     }
 
     const allowed = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
-    if (!allowed.includes(file.type)) {
-      this.imageFile.set(null);
-      this.imageError.set('Use a JPG, PNG, WEBP, or GIF image.');
-      input.value = '';
-      return;
+    const next = [...this.photos()];
+    let error: string | null = null;
+    for (const file of files) {
+      if (next.length >= 5) {
+        error = 'A story can have at most 5 photos.';
+        break;
+      }
+
+      if (!allowed.includes(file.type)) {
+        error = 'Use a JPG, PNG, WEBP, or GIF image.';
+        continue;
+      }
+
+      if (file.size > 5 * 1024 * 1024) {
+        error = 'Each photo must be 5 MB or smaller.';
+        continue;
+      }
+
+      this.photoKey += 1;
+      next.push({
+        key: String(this.photoKey),
+        id: null,
+        url: URL.createObjectURL(file),
+        file,
+      });
     }
 
-    if (file.size > 5 * 1024 * 1024) {
-      this.imageFile.set(null);
-      this.imageError.set('Image must be 5 MB or smaller.');
-      input.value = '';
-      return;
+    this.photos.set(next);
+    this.imageError.set(error);
+  }
+
+  protected removePhoto(key: string): void {
+    const photo = this.photos().find((item) => item.key === key);
+    if (photo?.url.startsWith('blob:')) {
+      URL.revokeObjectURL(photo.url);
     }
 
-    this.imageFile.set(file);
-    this.imageError.set(null);
-    this.previewUrl.set(URL.createObjectURL(file));
+    const next = this.photos().filter((item) => item.key !== key);
+    this.photos.set(next);
+    if (next.length <= 5 && this.imageError() === 'A story can have at most 5 photos.') {
+      this.imageError.set(null);
+    }
+    if (next.length > 0 && this.imageError() === 'Add at least one photo.') {
+      this.imageError.set(null);
+    }
   }
 
   ngOnDestroy(): void {
-    this.clearPreview();
-  }
-
-  private clearPreview(): void {
-    const url = this.previewUrl();
-    if (url?.startsWith('blob:')) {
-      URL.revokeObjectURL(url);
+    for (const photo of this.photos()) {
+      if (photo.url.startsWith('blob:')) {
+        URL.revokeObjectURL(photo.url);
+      }
     }
-    this.previewUrl.set(null);
   }
+}
+
+interface StoryPhoto {
+  key: string;
+  id: number | null;
+  url: string;
+  file: File | null;
 }

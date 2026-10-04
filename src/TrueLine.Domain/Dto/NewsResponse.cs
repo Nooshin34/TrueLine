@@ -31,4 +31,13 @@ public class NewsResponse
     public bool CanEdit { get; set; }
 
     public string? ImageUrl { get; set; }
+
+    public IReadOnlyList<NewsImageLink> Images { get; set; } = [];
+}
+
+public class NewsImageLink
+{
+    public int Id { get; set; }
+
+    public string Url { get; set; } = string.Empty;
 }

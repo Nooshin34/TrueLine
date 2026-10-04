@@ -23,6 +23,7 @@ export class NewsDetail implements OnInit {
   protected readonly loading = signal(true);
   protected readonly deleting = signal(false);
   protected readonly error = signal<string | null>(null);
+  protected readonly slide = signal(0);
   protected readonly coverStyle = coverStyle;
   protected readonly initial = initial;
   protected readonly timeAgo = timeAgo;
@@ -38,7 +39,8 @@ export class NewsDetail implements OnInit {
 
     this.newsService.getById(id).subscribe({
       next: (article) => {
-        this.article.set(article);
+        this.article.set({ ...article, images: article.images ?? [] });
+        this.slide.set(0);
         this.loading.set(false);
       },
       error: () => {
@@ -46,6 +48,18 @@ export class NewsDetail implements OnInit {
         this.loading.set(false);
       },
     });
+  }
+
+  protected showPhoto(index: number): void {
+    this.slide.set(index);
+  }
+
+  protected previousPhoto(count: number): void {
+    this.slide.update((current) => (current - 1 + count) % count);
+  }
+
+  protected nextPhoto(count: number): void {
+    this.slide.update((current) => (current + 1) % count);
   }
 
   protected remove(): void {

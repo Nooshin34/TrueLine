@@ -18,21 +18,29 @@ public interface INewsService
 
     Task<ServiceResult<News>> GetAsync(int id, CancellationToken cancellationToken);
 
-    Task<ServiceResult<NewsFile>> OpenImageAsync(int id, CancellationToken cancellationToken);
+    Task<ServiceResult<NewsFile>> OpenImageAsync(int id, int? imageId, CancellationToken cancellationToken);
 
-    Task<ServiceResult<News>> CreateAsync(NewsDraft draft, IncomingFile? image, CancellationToken cancellationToken);
+    Task<ServiceResult<News>> CreateAsync(NewsDraft draft, IReadOnlyList<IncomingFile> images, CancellationToken cancellationToken);
 
-    Task<ServiceResult<News>> UpdateAsync(int id, NewsDraft draft, IncomingFile? image, CancellationToken cancellationToken);
+    Task<ServiceResult<News>> UpdateAsync(
+        int id,
+        NewsDraft draft,
+        IReadOnlyList<IncomingFile> images,
+        IReadOnlyList<int> keepImageIds,
+        CancellationToken cancellationToken);
 
     Task<ServiceResult> DeleteAsync(int id, CancellationToken cancellationToken);
 }
 
 public sealed class NewsService : INewsService
 {
+    private const int MinImages = 1;
+    private const int MaxImages = 5;
     private const long MaxImageBytes = 5 * 1024 * 1024;
     private const string ImageStoreError =
         "Could not store the image. Check that MinIO is running and the MinIO settings are filled in.";
-    private const string ImageTypeError = "Image must be a JPG, PNG, WEBP, or GIF no larger than 5 MB.";
+    private const string ImageCountError = "Add 1 to 5 photos.";
+    private const string ImageTypeError = "Each photo must be a JPG, PNG, WEBP, or GIF no larger than 5 MB.";
 
     private static readonly HashSet<string> AllowedImageTypes = new(StringComparer.OrdinalIgnoreCase)
     {
@@ -153,15 +161,18 @@ public sealed class NewsService : INewsService
         return ServiceResult<News>.Ok(news);
     }
 
-    public async Task<ServiceResult<NewsFile>> OpenImageAsync(int id, CancellationToken cancellationToken)
+    public async Task<ServiceResult<NewsFile>> OpenImageAsync(int id, int? imageId, CancellationToken cancellationToken)
     {
         var news = await _news.FindAsync(id, tracked: false, cancellationToken);
-        if (news?.Image is null || !await CanReadAsync(news, cancellationToken))
+        var image = imageId is int requested
+            ? news?.Images.FirstOrDefault(item => item.Id == requested)
+            : news?.Images.OrderBy(item => item.SortOrder).ThenBy(item => item.Id).FirstOrDefault();
+        if (news is null || image is null || !await CanReadAsync(news, cancellationToken))
         {
             return ServiceResult<NewsFile>.Fail(ServiceError.NotFound);
         }
 
-        var stored = await _images.OpenAsync(news.Image.ObjectKey, cancellationToken);
+        var stored = await _images.OpenAsync(image.ObjectKey, cancellationToken);
         if (stored is null)
         {
             return ServiceResult<NewsFile>.Fail(ServiceError.NotFound);
@@ -170,18 +181,23 @@ public sealed class NewsService : INewsService
         return ServiceResult<NewsFile>.Ok(new NewsFile
         {
             Content = stored.Content,
-            ContentType = news.Image.ContentType,
+            ContentType = image.ContentType,
         });
     }
 
     public async Task<ServiceResult<News>> CreateAsync(
         NewsDraft draft,
-        IncomingFile? image,
+        IReadOnlyList<IncomingFile> images,
         CancellationToken cancellationToken)
     {
         try
         {
-            if (!TryValidateImage(image, out var imageError))
+            if (images.Count < MinImages || images.Count > MaxImages)
+            {
+                return ServiceResult<News>.Fail(ServiceError.BadRequest, ImageCountError);
+            }
+
+            if (!TryValidateImages(images, out var imageError))
             {
                 return ServiceResult<News>.Fail(ServiceError.BadRequest, imageError);
             }
@@ -214,18 +230,20 @@ public sealed class NewsService : INewsService
             _news.Add(news);
             await _news.SaveChangesAsync(cancellationToken);
 
-            if (image is not null)
+            var saved = new List<NewsImage>();
+            try
             {
-                try
+                for (var index = 0; index < images.Count; index++)
                 {
-                    await SaveImageAsync(news, image, cancellationToken);
+                    saved.Add(await SaveImageAsync(news, images[index], index, cancellationToken));
                 }
-                catch (Exception)
-                {
-                    _news.Remove(news);
-                    await _news.SaveChangesAsync(cancellationToken);
-                    return ServiceResult<News>.Fail(ServiceError.StorageFailed, ImageStoreError);
-                }
+            }
+            catch (Exception)
+            {
+                await DeleteStoredAsync(saved, cancellationToken);
+                _news.Remove(news);
+                await _news.SaveChangesAsync(cancellationToken);
+                return ServiceResult<News>.Fail(ServiceError.StorageFailed, ImageStoreError);
             }
 
             await AttachRatingsAsync([news], cancellationToken);
@@ -233,22 +251,20 @@ public sealed class NewsService : INewsService
         }
         finally
         {
-            if (image is not null)
-            {
-                await image.Content.DisposeAsync();
-            }
+            await DisposeFilesAsync(images);
         }
     }
 
     public async Task<ServiceResult<News>> UpdateAsync(
         int id,
         NewsDraft draft,
-        IncomingFile? image,
+        IReadOnlyList<IncomingFile> images,
+        IReadOnlyList<int> keepImageIds,
         CancellationToken cancellationToken)
     {
         try
         {
-            if (!TryValidateImage(image, out var imageError))
+            if (!TryValidateImages(images, out var imageError))
             {
                 return ServiceResult<News>.Fail(ServiceError.BadRequest, imageError);
             }
@@ -278,29 +294,71 @@ public sealed class NewsService : INewsService
                 existing.PublishedAt = draft.PublishedAt;
             }
 
-            await _news.SaveChangesAsync(cancellationToken);
-
-            if (image is not null)
+            var kept = new List<NewsImage>();
+            var seen = new HashSet<int>();
+            foreach (var imageId in keepImageIds)
             {
-                try
+                if (!seen.Add(imageId))
                 {
-                    await ReplaceImageAsync(existing, image, cancellationToken);
+                    continue;
                 }
-                catch (Exception)
+
+                var match = existing.Images.FirstOrDefault(image => image.Id == imageId);
+                if (match is not null)
                 {
-                    return ServiceResult<News>.Fail(ServiceError.StorageFailed, ImageStoreError);
+                    kept.Add(match);
                 }
             }
+
+            if (kept.Count + images.Count is < MinImages or > MaxImages)
+            {
+                return ServiceResult<News>.Fail(ServiceError.BadRequest, ImageCountError);
+            }
+
+            var added = new List<NewsImage>();
+            try
+            {
+                for (var index = 0; index < images.Count; index++)
+                {
+                    added.Add(await SaveImageAsync(existing, images[index], kept.Count + index, cancellationToken));
+                }
+            }
+            catch (Exception)
+            {
+                await DeleteStoredAsync(added, cancellationToken);
+                foreach (var image in added)
+                {
+                    existing.Images.Remove(image);
+                    _news.RemoveImage(image);
+                }
+
+                await _news.SaveChangesAsync(cancellationToken);
+                return ServiceResult<News>.Fail(ServiceError.StorageFailed, ImageStoreError);
+            }
+
+            var removed = existing.Images
+                .Where(image => !kept.Contains(image) && !added.Contains(image))
+                .ToList();
+            foreach (var image in removed)
+            {
+                existing.Images.Remove(image);
+                _news.RemoveImage(image);
+            }
+
+            for (var index = 0; index < kept.Count; index++)
+            {
+                kept[index].SortOrder = index;
+            }
+
+            await _news.SaveChangesAsync(cancellationToken);
+            await DeleteStoredAsync(removed, cancellationToken);
 
             await AttachRatingsAsync([existing], cancellationToken);
             return ServiceResult<News>.Ok(existing);
         }
         finally
         {
-            if (image is not null)
-            {
-                await image.Content.DisposeAsync();
-            }
+            await DisposeFilesAsync(images);
         }
     }
 
@@ -312,44 +370,18 @@ public sealed class NewsService : INewsService
             return ServiceResult.Fail(ServiceError.NotFound);
         }
 
-        if (existing.Image is not null)
-        {
-            try
-            {
-                await _images.DeleteAsync(existing.Image.ObjectKey, cancellationToken);
-            }
-            catch (Exception)
-            {
-            }
-        }
+        await DeleteStoredAsync(existing.Images, cancellationToken);
 
         _news.Remove(existing);
         await _news.SaveChangesAsync(cancellationToken);
         return ServiceResult.Ok();
     }
 
-    private async Task ReplaceImageAsync(News news, IncomingFile image, CancellationToken cancellationToken)
-    {
-        if (news.Image is not null)
-        {
-            var previousKey = news.Image.ObjectKey;
-            _news.RemoveImage(news.Image);
-            news.Image = null;
-            await _news.SaveChangesAsync(cancellationToken);
-
-            try
-            {
-                await _images.DeleteAsync(previousKey, cancellationToken);
-            }
-            catch (Exception)
-            {
-            }
-        }
-
-        await SaveImageAsync(news, image, cancellationToken);
-    }
-
-    private async Task SaveImageAsync(News news, IncomingFile image, CancellationToken cancellationToken)
+    private async Task<NewsImage> SaveImageAsync(
+        News news,
+        IncomingFile image,
+        int sortOrder,
+        CancellationToken cancellationToken)
     {
         var objectKey = await _images.UploadAsync(
             news.Id,
@@ -358,32 +390,65 @@ public sealed class NewsService : INewsService
             image.ContentType,
             cancellationToken);
 
-        news.Image = new NewsImage
+        var stored = new NewsImage
         {
             NewsId = news.Id,
             ObjectKey = objectKey,
             ContentType = image.ContentType,
             OriginalFileName = Path.GetFileName(image.FileName),
+            SortOrder = sortOrder,
         };
 
-        _news.AddImage(news.Image);
-        await _news.SaveChangesAsync(cancellationToken);
+        news.Images.Add(stored);
+        try
+        {
+            await _news.SaveChangesAsync(cancellationToken);
+        }
+        catch
+        {
+            news.Images.Remove(stored);
+            _news.RemoveImage(stored);
+            await DeleteStoredAsync([stored], cancellationToken);
+            throw;
+        }
+
+        return stored;
     }
 
-    private static bool TryValidateImage(IncomingFile? image, out string? error)
+    private async Task DeleteStoredAsync(IEnumerable<NewsImage> images, CancellationToken cancellationToken)
     {
+        foreach (var image in images)
+        {
+            try
+            {
+                await _images.DeleteAsync(image.ObjectKey, cancellationToken);
+            }
+            catch (Exception)
+            {
+            }
+        }
+    }
+
+    private static async Task DisposeFilesAsync(IEnumerable<IncomingFile> images)
+    {
+        foreach (var image in images)
+        {
+            await image.Content.DisposeAsync();
+        }
+    }
+
+    private static bool TryValidateImages(IReadOnlyList<IncomingFile> images, out string? error)
+    {
+        foreach (var image in images)
+        {
+            if (image.Length > MaxImageBytes || !AllowedImageTypes.Contains(image.ContentType))
+            {
+                error = ImageTypeError;
+                return false;
+            }
+        }
+
         error = null;
-        if (image is null || image.Length == 0)
-        {
-            return true;
-        }
-
-        if (image.Length > MaxImageBytes || !AllowedImageTypes.Contains(image.ContentType))
-        {
-            error = ImageTypeError;
-            return false;
-        }
-
         return true;
     }
 

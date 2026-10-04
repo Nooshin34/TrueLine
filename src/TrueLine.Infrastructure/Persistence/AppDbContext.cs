@@ -59,9 +59,9 @@ public class AppDbContext : DbContext
 
             news.HasIndex(item => item.ReporterId);
 
-            news.HasOne(item => item.Image)
+            news.HasMany(item => item.Images)
                 .WithOne(image => image.News)
-                .HasForeignKey<NewsImage>(image => image.NewsId)
+                .HasForeignKey(image => image.NewsId)
                 .OnDelete(DeleteBehavior.Cascade);
         });
 
@@ -81,8 +81,11 @@ public class AppDbContext : DbContext
                 .IsRequired()
                 .HasMaxLength(260);
 
-            image.HasIndex(item => item.NewsId)
-                .IsUnique();
+            image.Property(item => item.SortOrder)
+                .IsRequired()
+                .HasDefaultValue(0);
+
+            image.HasIndex(item => item.NewsId);
         });
 
         modelBuilder.Entity<Reporter>(reporter =>

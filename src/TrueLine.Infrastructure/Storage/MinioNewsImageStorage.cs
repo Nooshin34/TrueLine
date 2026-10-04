@@ -53,7 +53,7 @@ public class MinioNewsImageStorage : INewsImageStorage
                     .WithCallbackStream(stream => stream.CopyTo(memory)),
                 cancellationToken);
         }
-        catch (ObjectNotFoundException)
+        catch (Exception)
         {
             await memory.DisposeAsync();
             return null;

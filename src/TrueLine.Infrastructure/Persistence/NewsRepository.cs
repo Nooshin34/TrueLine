@@ -17,7 +17,7 @@ public sealed class NewsRepository : INewsRepository
     {
         return await _db.News
             .AsNoTracking()
-            .Include(item => item.Image)
+            .Include(item => item.Images.OrderBy(image => image.SortOrder).ThenBy(image => image.Id))
             .Where(item => item.IsPublished && item.IsApproved)
             .OrderByDescending(item => item.PublishedAt)
             .ToListAsync(cancellationToken);
@@ -27,7 +27,7 @@ public sealed class NewsRepository : INewsRepository
     {
         return await _db.News
             .AsNoTracking()
-            .Include(item => item.Image)
+            .Include(item => item.Images.OrderBy(image => image.SortOrder).ThenBy(image => image.Id))
             .Where(item => item.IsPublished)
             .OrderBy(item => item.IsApproved)
             .ThenByDescending(item => item.PublishedAt)
@@ -38,7 +38,7 @@ public sealed class NewsRepository : INewsRepository
     {
         return await _db.News
             .AsNoTracking()
-            .Include(item => item.Image)
+            .Include(item => item.Images.OrderBy(image => image.SortOrder).ThenBy(image => image.Id))
             .Where(item => item.ReporterId == userId)
             .OrderByDescending(item => item.PublishedAt)
             .ToListAsync(cancellationToken);
@@ -46,7 +46,9 @@ public sealed class NewsRepository : INewsRepository
 
     public Task<News?> FindAsync(int id, bool tracked, CancellationToken cancellationToken)
     {
-        var query = _db.News.Include(item => item.Image).AsQueryable();
+        var query = _db.News
+            .Include(item => item.Images.OrderBy(image => image.SortOrder).ThenBy(image => image.Id))
+            .AsQueryable();
         if (!tracked)
         {
             query = query.AsNoTracking();

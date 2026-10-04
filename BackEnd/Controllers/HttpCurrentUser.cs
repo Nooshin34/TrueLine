@@ -1,9 +1,9 @@
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
-using TrueLine.Application.Interfaces;
 using TrueLine.Application.Auth;
+using TrueLine.Application.Interfaces;
 
-namespace TrueLine.Api.Auth;
+namespace TrueLine.Api.Controllers;
 
 public sealed class HttpCurrentUser : ICurrentUser
 {
