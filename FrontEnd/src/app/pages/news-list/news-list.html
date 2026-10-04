@@ -1,5 +1,10 @@
-@if (category(); as name) {
+@if (query(); as term) {
   <section class="welcome">
+    <p class="eyebrow">Search</p>
+    <h1>Results for “{{ term }}”</h1>
+  </section>
+} @else if (category(); as name) {
+  <section class="welcome" [attr.data-topic]="name">
     <p class="eyebrow">Category</p>
     <h1>{{ name }}</h1>
   </section>
@@ -15,14 +20,42 @@
 } @else if (error()) {
   <p class="status error">{{ error() }}</p>
 } @else if (stories().length === 0) {
-  @if (category(); as name) {
+  @if (query(); as term) {
+    <p class="status">No stories match “{{ term }}”.</p>
+  } @else if (category(); as name) {
     <p class="status">No {{ name }} stories yet.</p>
   } @else {
     <p class="status">No published stories yet. <a routerLink="/admin/new">Write the first one</a>.</p>
   }
+} @else if (query()) {
+  <section class="latest results">
+    <div class="cards">
+      @for (item of stories(); track item.id) {
+        <article class="card" [attr.data-topic]="item.category">
+          <a
+            class="thumb"
+            [class.has-photo]="item.imageUrl"
+            [routerLink]="['/news', item.id]"
+            [style.background]="item.imageUrl ? null : coverStyle(item.title)"
+          >
+            @if (item.imageUrl) {
+              <img [src]="item.imageUrl" [alt]="item.title" />
+            } @else {
+              <span class="letter">{{ initial(item.title) }}</span>
+            }
+            <span class="chip on-image" [attr.data-topic]="item.category">{{ item.category }}</span>
+            <span class="thumb-copy">
+              <h3 class="thumb-title">{{ item.title }}</h3>
+              <span class="thumb-meta">{{ item.author }} · {{ timeAgo(item.publishedAt) }}</span>
+            </span>
+          </a>
+        </article>
+      }
+    </div>
+  </section>
 } @else {
   @if (featured(); as lead) {
-    <article class="feature">
+    <article class="feature" [attr.data-topic]="lead.category">
       <a
         class="cover"
         [class.has-photo]="lead.imageUrl"
@@ -36,12 +69,13 @@
         }
       </a>
       <div class="feature-copy">
-        <p class="kicker">{{ lead.author }} <app-stars [value]="lead.authorStars" /> · {{ timeAgo(lead.publishedAt) }}</p>
+        <span class="chip on-image" [attr.data-topic]="lead.category">{{ lead.category }}</span>
         <h2><a [routerLink]="['/news', lead.id]">{{ lead.title }}</a></h2>
         @if (lead.summary) {
           <p class="dek">{{ lead.summary }}</p>
         }
-        <p class="foot">{{ lead.category }} · {{ readMinutes(lead.body) }} min read · {{ lead.viewCount }} reads</p>
+        <p class="kicker">{{ lead.author }} <app-stars [value]="lead.authorStars" /> <span class="when">· {{ timeAgo(lead.publishedAt) }}</span></p>
+        <p class="foot">{{ readMinutes(lead.body) }} min read · {{ lead.viewCount }} reads</p>
       </div>
     </article>
   }
@@ -49,12 +83,12 @@
   <div class="layout" [class.solo]="stories().length <= 4">
     @if (latest().length > 0) {
     <section class="latest" id="latest">
-      <div class="section-head">
+      <div class="section-head" [attr.data-topic]="category()">
         <h2>{{ category() ?? 'Latest' }}</h2>
       </div>
         <div class="cards">
           @for (item of latest(); track item.id) {
-            <article class="card">
+            <article class="card" [attr.data-topic]="item.category">
               <a
                 class="thumb"
                 [class.has-photo]="item.imageUrl"
@@ -64,15 +98,14 @@
                 @if (item.imageUrl) {
                   <img [src]="item.imageUrl" [alt]="item.title" />
                 } @else {
-                  <span>{{ initial(item.title) }}</span>
+                  <span class="letter">{{ initial(item.title) }}</span>
                 }
+                <span class="chip on-image" [attr.data-topic]="item.category">{{ item.category }}</span>
+                <span class="thumb-copy">
+                  <h3 class="thumb-title">{{ item.title }}</h3>
+                  <span class="thumb-meta">{{ item.author }} · {{ timeAgo(item.publishedAt) }}</span>
+                </span>
               </a>
-              <p class="kicker">{{ item.author }} <app-stars [value]="item.authorStars" /> · {{ timeAgo(item.publishedAt) }}</p>
-              <h3><a [routerLink]="['/news', item.id]">{{ item.title }}</a></h3>
-              @if (item.summary) {
-                <p class="dek">{{ item.summary }}</p>
-              }
-              <p class="foot">{{ item.category }} · {{ readMinutes(item.body) }} min read · {{ item.viewCount }} reads</p>
             </article>
           }
         </div>
@@ -86,7 +119,7 @@
         </div>
         <div class="picks">
           @for (item of picks(); track item.id) {
-            <a class="pick" [routerLink]="['/news', item.id]">
+            <a class="pick" [attr.data-topic]="item.category" [routerLink]="['/news', item.id]">
               <span
                 class="pick-thumb"
                 [class.has-photo]="item.imageUrl"

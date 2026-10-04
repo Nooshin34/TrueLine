@@ -13,8 +13,9 @@ export class NewsService {
   private readonly http = inject(HttpClient);
   private readonly apiUrl = 'http://localhost:5230/api/news';
 
-  getPublished(): Observable<News[]> {
-    return this.http.get<News[]>(this.apiUrl);
+  getPublished(term = ''): Observable<News[]> {
+    const q = term.trim();
+    return this.http.get<News[]>(this.apiUrl, { params: q ? { q } : {} });
   }
 
   getById(id: number): Observable<News> {

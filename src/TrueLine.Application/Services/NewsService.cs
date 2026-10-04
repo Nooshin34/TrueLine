@@ -6,7 +6,7 @@ namespace TrueLine.Application.Services;
 
 public interface INewsService
 {
-    Task<IReadOnlyList<News>> GetPublishedAsync(CancellationToken cancellationToken);
+    Task<IReadOnlyList<News>> GetPublishedAsync(string? term, CancellationToken cancellationToken);
 
     Task<ServiceResult<IReadOnlyList<News>>> GetMineAsync(CancellationToken cancellationToken);
 
@@ -70,9 +70,15 @@ public sealed class NewsService : INewsService
         _admins = admins;
     }
 
-    public async Task<IReadOnlyList<News>> GetPublishedAsync(CancellationToken cancellationToken)
+    public async Task<IReadOnlyList<News>> GetPublishedAsync(string? term, CancellationToken cancellationToken)
     {
-        var news = await _news.ListPublishedAsync(cancellationToken);
+        var text = term?.Trim();
+        if (text is { Length: > 100 })
+        {
+            text = text[..100];
+        }
+
+        var news = await _news.ListPublishedAsync(text, cancellationToken);
         await AttachRatingsAsync(news, cancellationToken);
         return news;
     }

@@ -4,7 +4,7 @@ namespace TrueLine.Application.Interfaces;
 
 public interface INewsRepository
 {
-    Task<IReadOnlyList<News>> ListPublishedAsync(CancellationToken cancellationToken);
+    Task<IReadOnlyList<News>> ListPublishedAsync(string? term, CancellationToken cancellationToken);
 
     Task<IReadOnlyList<News>> ListSubmittedAsync(CancellationToken cancellationToken);
 

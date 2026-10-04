@@ -13,12 +13,24 @@ public sealed class NewsRepository : INewsRepository
         _db = db;
     }
 
-    public async Task<IReadOnlyList<News>> ListPublishedAsync(CancellationToken cancellationToken)
+    public async Task<IReadOnlyList<News>> ListPublishedAsync(string? term, CancellationToken cancellationToken)
     {
-        return await _db.News
+        var query = _db.News
             .AsNoTracking()
             .Include(item => item.Images.OrderBy(image => image.SortOrder).ThenBy(image => image.Id))
-            .Where(item => item.IsPublished && item.IsApproved)
+            .Where(item => item.IsPublished && item.IsApproved);
+
+        if (!string.IsNullOrWhiteSpace(term))
+        {
+            var text = term.Trim();
+            query = query.Where(item =>
+                item.Title.Contains(text)
+                || (item.Summary != null && item.Summary.Contains(text))
+                || item.Body.Contains(text)
+                || item.Author.Contains(text));
+        }
+
+        return await query
             .OrderByDescending(item => item.PublishedAt)
             .ToListAsync(cancellationToken);
     }

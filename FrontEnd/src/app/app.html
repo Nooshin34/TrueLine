@@ -19,6 +19,13 @@
         }
       </nav>
       <div class="tools">
+      <form class="search" (ngSubmit)="search(searchBox.value)">
+        <label>
+          <span class="search-label">Search stories</span>
+          <input #searchBox type="search" name="q" placeholder="Search stories" [value]="searchQuery()" />
+        </label>
+        <button type="submit">Search</button>
+      </form>
       <button
         type="button"
         class="theme"
@@ -78,6 +85,7 @@
           <a
             [routerLink]="['/']"
             [queryParams]="{ category }"
+            [attr.data-topic]="category"
             routerLinkActive="active"
             [routerLinkActiveOptions]="{ exact: true, queryParams: 'exact' }"
           >
@@ -90,6 +98,40 @@
     <main>
       <router-outlet />
     </main>
+    <footer class="site-footer">
+      <div class="footer-brand">
+        <a class="brand" routerLink="/">TrueLine</a>
+        <p>Stories with a clear line, written to be read.</p>
+      </div>
+      <div>
+        <h2>Sections</h2>
+        <nav aria-label="Footer sections">
+          @for (category of categories; track category) {
+            <a [routerLink]="['/']" [queryParams]="{ category }" [attr.data-topic]="category">{{ category }}</a>
+          }
+        </nav>
+      </div>
+      <div>
+        <h2>The desk</h2>
+        <nav aria-label="Footer">
+          <a routerLink="/">Latest</a>
+          @if (!isAdmin()) {
+            <a routerLink="/admin/new">Write</a>
+          }
+          @if (session() && !isAdmin()) {
+            <a routerLink="/dashboard">Dashboard</a>
+          }
+          @if (isAdmin()) {
+            <a routerLink="/review">Review</a>
+          }
+          @if (!session()) {
+            <a routerLink="/login">Log in</a>
+            <a routerLink="/register">Register</a>
+          }
+        </nav>
+      </div>
+      <p class="footer-note">© {{ year }} TrueLine</p>
+    </footer>
   </div>
 </div>
 <app-dialog />

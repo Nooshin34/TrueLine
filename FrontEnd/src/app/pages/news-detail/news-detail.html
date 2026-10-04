@@ -6,6 +6,7 @@
   } @else if (error()) {
     <p class="status error">{{ error() }}</p>
   } @else if (article(); as item) {
+    <div class="story-body" [attr.data-topic]="item.category">
     <div
       class="cover"
       [class.has-photo]="item.images.length > 0"
@@ -35,12 +36,15 @@
         <span>{{ initial(item.title) }}</span>
       }
     </div>
-    <p class="kicker">{{ item.author }} · {{ timeAgo(item.publishedAt) }}</p>
+    <p class="kicker">{{ item.author }} <span class="when">· {{ timeAgo(item.publishedAt) }}</span></p>
     <h1>{{ item.title }}</h1>
     @if (item.summary) {
       <p class="dek">{{ item.summary }}</p>
     }
-    <p class="foot">{{ item.category }} · {{ readMinutes(item.body) }} min read</p>
+    <p class="foot">
+      <span class="chip" [attr.data-topic]="item.category">{{ item.category }}</span>
+      <span>{{ readMinutes(item.body) }} min read</span>
+    </p>
     <p class="reads">
       {{ item.viewCount }} reads
       <app-stars [value]="item.authorStars" />
@@ -54,5 +58,6 @@
       </div>
     }
     <p class="body">{{ item.body }}</p>
+    </div>
   }
 </article>

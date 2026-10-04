@@ -25,6 +25,13 @@
   --edit-hover: #1b46b5;
   --delete: #d0122d;
   --delete-hover: #a50e24;
+  --cat-world: #1f8a70;
+  --cat-politics: #2457d6;
+  --cat-business: #d97706;
+  --cat-sport: #16a34a;
+  --cat-culture: #c026d3;
+  --cat-technology: #0891b2;
+  --cat-science: #7c3aed;
 }
 
 :root[data-theme='dark'] {
@@ -48,6 +55,13 @@
   --edit-hover: #60a5fa;
   --delete: #f43f5e;
   --delete-hover: #fb7185;
+  --cat-world: #3dbea0;
+  --cat-politics: #8eb0ff;
+  --cat-business: #f0a04b;
+  --cat-sport: #4ade80;
+  --cat-culture: #f0abfc;
+  --cat-technology: #67e8f9;
+  --cat-science: #c4b5fd;
 }
 
 body {
@@ -57,7 +71,50 @@ body {
   color: var(--text);
   background:
     radial-gradient(900px 380px at 8% -8%, color-mix(in srgb, var(--accent) 16%, transparent), transparent 62%),
+    radial-gradient(720px 320px at 96% 0%, color-mix(in srgb, var(--cat-politics) 14%, transparent), transparent 64%),
     var(--canvas);
+}
+
+[data-topic='World'] {
+  --topic: var(--cat-world);
+}
+
+[data-topic='Politics'] {
+  --topic: var(--cat-politics);
+}
+
+[data-topic='Business'] {
+  --topic: var(--cat-business);
+}
+
+[data-topic='Sport'] {
+  --topic: var(--cat-sport);
+}
+
+[data-topic='Culture'] {
+  --topic: var(--cat-culture);
+}
+
+[data-topic='Technology'] {
+  --topic: var(--cat-technology);
+}
+
+[data-topic='Science'] {
+  --topic: var(--cat-science);
+}
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 9px;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--topic, var(--accent)) 16%, transparent);
+  color: var(--topic, var(--accent));
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  line-height: 1.4;
+  text-transform: uppercase;
 }
 
 ::selection {

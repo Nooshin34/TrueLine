@@ -143,6 +143,11 @@
   font-weight: 700;
 }
 
+.when {
+  color: var(--faint);
+  font-weight: 500;
+}
+
 .story h1 {
   margin: 10px 0 14px;
   font-size: clamp(2.2rem, 5vw, 3.4rem);
@@ -152,12 +157,18 @@
 
 .dek {
   margin: 0;
+  padding-left: 14px;
+  border-left: 3px solid var(--topic, var(--accent));
   color: var(--dek);
   font-size: 1.25rem;
   line-height: 1.5;
 }
 
 .foot {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
   margin-top: 16px;
   color: var(--faint);
   font-weight: 500;

@@ -1,5 +1,5 @@
 const covers = [
-  'linear-gradient(155deg, #8d2a32 0%, #2a1216 100%)',
+  'linear-gradient(155deg, #4a5563 0%, #1c2128 100%)',
   'linear-gradient(155deg, #1e3d66 0%, #101820 100%)',
   'linear-gradient(155deg, #3e5340 0%, #172018 100%)',
   'linear-gradient(155deg, #6d432c 0%, #24170f 100%)',

@@ -21,9 +21,11 @@ public class NewsController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<ActionResult<IEnumerable<NewsResponse>>> GetPublished(CancellationToken cancellationToken)
+    public async Task<ActionResult<IEnumerable<NewsResponse>>> GetPublished(
+        [FromQuery] string? q,
+        CancellationToken cancellationToken)
     {
-        var news = await _news.GetPublishedAsync(cancellationToken);
+        var news = await _news.GetPublishedAsync(q, cancellationToken);
         return Ok(news.Select(ToResponse));
     }
 

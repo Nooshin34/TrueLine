@@ -26,6 +26,7 @@ export class App implements OnInit {
   });
   protected readonly menuOpen = signal(false);
   protected readonly categories = newsCategories;
+  protected readonly year = new Date().getFullYear();
   private readonly path = toSignal(
     this.router.events.pipe(
       filter((event): event is NavigationEnd => event instanceof NavigationEnd),
@@ -38,9 +39,25 @@ export class App implements OnInit {
     const path = this.path();
     return path === '/' || path.startsWith('/news/');
   });
+  protected readonly searchQuery = toSignal(
+    this.router.events.pipe(
+      filter((event): event is NavigationEnd => event instanceof NavigationEnd),
+      map(() => new URL(this.router.url, 'http://localhost').searchParams.get('q') ?? ''),
+      startWith(new URL(this.router.url, 'http://localhost').searchParams.get('q') ?? ''),
+    ),
+    { initialValue: new URL(this.router.url, 'http://localhost').searchParams.get('q') ?? '' },
+  );
 
   ngOnInit(): void {
     this.auth.loadAvatar();
+  }
+
+  protected search(value: string): void {
+    const q = value.trim();
+    this.router.navigate(['/'], {
+      queryParams: { q: q || null },
+      queryParamsHandling: 'merge',
+    });
   }
 
   protected toggleTheme(): void {
