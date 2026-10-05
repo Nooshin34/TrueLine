@@ -8,7 +8,7 @@ public sealed class ReporterConfiguration : IEntityTypeConfiguration<Reporter>
 {
     public void Configure(EntityTypeBuilder<Reporter> builder)
     {
-        builder.ToTable("Reporters");
+        builder.ToTable("Journalists");
 
         builder.HasKey(item => item.Id);
 

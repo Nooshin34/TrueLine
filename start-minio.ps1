@@ -30,4 +30,4 @@ $env:MINIO_ROOT_USER = $userName
 $env:MINIO_ROOT_PASSWORD = $password
 Write-Host "Starting MinIO from $data. Keep this window open."
 Write-Host "The site uses the AccessKey and SecretKey already saved in appsettings.json."
-& $exe server $data --address ":9000" --console-address ":9001"
+& $exe server $data --address "127.0.0.1:9000" --console-address "127.0.0.1:9001"
