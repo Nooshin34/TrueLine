@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 800" role="img" aria-label="A sunlit street and a shaded tree">
+  <rect width="1200" height="800" fill="#f2c14e"/>
+  <circle cx="980" cy="150" r="80" fill="#fff6d8"/>
+  <rect y="560" width="1200" height="240" fill="#c46b4a"/>
+  <rect x="80" y="300" width="220" height="260" fill="#f7f1e6"/>
+  <rect x="140" y="360" width="40" height="50" fill="#1e3d66"/>
+  <rect x="200" y="360" width="40" height="50" fill="#1e3d66"/>
+  <rect x="360" y="250" width="180" height="310" fill="#e7d7c3"/>
+  <polygon points="300,250 450,160 600,250" fill="#d0122d"/>
+  <circle cx="860" cy="430" r="120" fill="#3e5340"/>
+  <rect x="844" y="500" width="32" height="180" fill="#6d432c"/>
+  <rect x="80" y="620" width="520" height="16" fill="#f6d48a"/>
+  <rect x="700" y="640" width="360" height="16" fill="#8d5a3c"/>
+</svg>

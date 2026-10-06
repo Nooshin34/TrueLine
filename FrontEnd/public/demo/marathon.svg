@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 800" role="img" aria-label="Runners at dawn along the harbor">
+  <defs>
+    <linearGradient id="dawn" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#24324a"/>
+      <stop offset="0.5" stop-color="#e28b62"/>
+      <stop offset="1" stop-color="#f6d48a"/>
+    </linearGradient>
+  </defs>
+  <rect width="1200" height="800" fill="url(#dawn)"/>
+  <circle cx="240" cy="470" r="70" fill="#f6d48a"/>
+  <rect y="560" width="1200" height="240" fill="#2d3a4a"/>
+  <path d="M0 560 H1200 V620 H0 Z" fill="#1e3d66"/>
+  <g fill="#1c2128">
+    <circle cx="430" cy="500" r="16"/>
+    <rect x="422" y="516" width="16" height="36" rx="6"/>
+    <path d="M418 548 l-20 36 h14 l16 -28 14 28 h14 l-22 -36 z"/>
+    <circle cx="560" cy="512" r="16"/>
+    <rect x="552" y="528" width="16" height="34" rx="6"/>
+    <path d="M548 558 l-18 34 h14 l14 -24 12 24 h14 l-20 -34 z"/>
+    <circle cx="690" cy="496" r="16"/>
+    <rect x="682" y="512" width="16" height="38" rx="6"/>
+    <path d="M678 546 l-20 38 h14 l16 -28 14 28 h14 l-22 -38 z"/>
+  </g>
+  <rect x="300" y="500" width="70" height="8" fill="#d0122d"/>
+</svg>

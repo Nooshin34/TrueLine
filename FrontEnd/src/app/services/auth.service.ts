@@ -1,25 +1,35 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable, computed, inject, signal } from '@angular/core';
 import { Observable, catchError, map, of, switchMap, tap } from 'rxjs';
+import { demoReadOnly } from '../demo/demo-mode';
 import { AuthResponse, AuthSession } from '../models/auth';
+import { environment } from '../../environments/environment';
 
 const storageKey = 'trueline-session';
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
   private readonly http = inject(HttpClient);
-  private readonly apiUrl = 'http://localhost:5230/api/auth';
+  private readonly apiUrl = environment.authApi;
 
   readonly session = signal<AuthSession | null>(this.read());
   readonly isLoggedIn = computed(() => this.session() !== null);
 
   register(name: string, email: string, password: string): Observable<AuthResponse> {
+    if (environment.demo) {
+      return demoReadOnly();
+    }
+
     return this.http
       .post<AuthResponse>(`${this.apiUrl}/register`, { name, email, password })
       .pipe(tap((response) => this.store(response)));
   }
 
   login(email: string, password: string): Observable<AuthResponse> {
+    if (environment.demo) {
+      return demoReadOnly();
+    }
+
     return this.http
       .post<AuthResponse>(`${this.apiUrl}/login`, { email, password })
       .pipe(tap((response) => this.store(response)));
@@ -51,6 +61,10 @@ export class AuthService {
   }
 
   uploadAvatar(file: File): Observable<void> {
+    if (environment.demo) {
+      return demoReadOnly();
+    }
+
     const data = new FormData();
     data.append('file', file);
     return this.http.post(`${this.apiUrl}/avatar`, data, { responseType: 'text' }).pipe(

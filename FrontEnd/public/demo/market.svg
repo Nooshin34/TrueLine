@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 800" role="img" aria-label="An uphill market of striped awnings">
+  <rect width="1200" height="800" fill="#8ec6e6"/>
+  <circle cx="980" cy="140" r="70" fill="#fff4c2"/>
+  <path d="M0 520 C200 470 280 560 460 500 C680 420 760 540 1200 430 V800 H0 Z" fill="#6f8f5a"/>
+  <path d="M0 640 C240 590 360 690 620 640 C860 590 980 700 1200 650 V800 H0 Z" fill="#d7c4a3"/>
+  <g>
+    <path d="M140 560 l80 -70 h160 l80 70 z" fill="#d0122d"/>
+    <rect x="190" y="560" width="220" height="90" fill="#f7f1e6"/>
+    <path d="M470 590 l70 -60 h150 l70 60 z" fill="#1e3d66"/>
+    <rect x="510" y="590" width="200" height="80" fill="#fff"/>
+    <path d="M760 540 l90 -80 h180 l90 80 z" fill="#f0b429"/>
+    <rect x="820" y="540" width="240" height="100" fill="#f7f1e6"/>
+  </g>
+  <rect x="210" y="600" width="40" height="28" fill="#c46b4a"/>
+  <rect x="270" y="608" width="50" height="22" fill="#3e5340"/>
+  <rect x="850" y="580" width="46" height="30" fill="#d0122d"/>
+  <rect x="910" y="586" width="60" height="24" fill="#1e3d66"/>
+</svg>

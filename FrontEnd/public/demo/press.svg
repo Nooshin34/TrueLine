@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 800" role="img" aria-label="A shared printing floor">
+  <rect width="1200" height="800" fill="#e7e1d6"/>
+  <rect x="0" y="620" width="1200" height="180" fill="#4a4036"/>
+  <rect x="180" y="250" width="520" height="300" rx="12" fill="#2c333c"/>
+  <rect x="210" y="280" width="460" height="40" fill="#d0122d"/>
+  <rect x="230" y="360" width="300" height="140" fill="#f7f4ee"/>
+  <rect x="250" y="385" width="220" height="8" fill="#1c2128"/>
+  <rect x="250" y="410" width="180" height="8" fill="#1c2128"/>
+  <rect x="250" y="435" width="200" height="8" fill="#1c2128"/>
+  <rect x="760" y="340" width="220" height="260" fill="#f4f0e6" stroke="#2c333c" stroke-width="8"/>
+  <rect x="790" y="390" width="160" height="10" fill="#1c2128"/>
+  <rect x="790" y="420" width="120" height="10" fill="#1c2128"/>
+  <rect x="790" y="450" width="140" height="10" fill="#d0122d"/>
+  <circle cx="250" cy="620" r="28" fill="#1c2128"/>
+  <circle cx="630" cy="620" r="28" fill="#1c2128"/>
+</svg>
